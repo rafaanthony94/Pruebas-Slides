@@ -368,7 +368,7 @@ nav ul li a:hover {
 
           newScrollTop = scrollTop + scrollOffset * easedProgress * direction;
 
-          window.scrollTo({ top: newScrollTop, behavior: 'auto' }); // Actualiza la posición
+          window.scrollTo({ top: newScrollTop, behavior: 'smooth' }); // Actualiza la posición
 
           if (progress < 1) {
             requestAnimationFrame(animateScroll);
@@ -384,6 +384,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script>
+    </script><br>
 </body>
 </html>
