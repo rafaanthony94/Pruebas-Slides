@@ -288,91 +288,59 @@ nav ul li a:hover {
         document.addEventListener('DOMContentLoaded', () => {
             let isScrolling;
             let isAnimating = false; // Controla si estamos animando el scroll
-            let allowScrollHandling = true; // Permite manejar el scroll solo después de un retardo
-        
-            const updateLastScrollPosition = () => {
-                // Actualizar la última posición de scroll solo después de que la animación haya terminado y haya pasado un breve retardo
-                setTimeout(() => {
-                    lastScrollPosition = window.pageYOffset;
-                }, 100); // Pequeño retardo para actualizar la última posición
-            };
+            let manualScrollDetected = false; // Indica si se ha detectado un scroll manual
         
             window.addEventListener('scroll', () => {
-                // Si se está animando o no se permite manejar el scroll, no hacer nada
-                if (isAnimating || !allowScrollHandling) return;
-        
-                const currentScrollPosition = window.pageYOffset;
-                if (Math.abs(currentScrollPosition - lastScrollPosition) > 5) { // Umbral de 5px para ignorar pequeños scrolls automáticos
-                    window.clearTimeout(isScrolling);
-        
-                    isScrolling = setTimeout(() => {
-                        if (!isAnimating) {
-                            autoScrollToClosestSlide();
-                            updateLastScrollPosition();
-                        }
-                    }, 66);
+                // Detectar scroll manual
+                if (!isAnimating) {
+                    manualScrollDetected = true;
                 }
+        
+                window.clearTimeout(isScrolling);
+                isScrolling = setTimeout(() => {
+                    if (!isAnimating && manualScrollDetected) {
+                        autoScrollToClosestSlide();
+                        manualScrollDetected = false; // Resetear la detección de scroll manual
+                    }
+                }, 66);
             });
         });
         
         function autoScrollToClosestSlide() {
             const slides = document.querySelectorAll('.slide');
-            let targetSlide = slides[0];
-            let minVisibleHeight = window.innerHeight;
+            let closestSlide = slides[0];
+            let closestDistance = Infinity;
         
-            for (const slide of slides) {
+            slides.forEach(slide => {
                 const rect = slide.getBoundingClientRect();
-                const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-                if (visibleHeight < minVisibleHeight && visibleHeight > 0) {
-                    targetSlide = slide;
-                    minVisibleHeight = visibleHeight;
-                }
-            }
+                const distance = Math.abs(rect.top); // Distancia del slide al top del viewport
         
-            smoothScrollToElement(targetSlide);
+                if (distance < closestDistance) {
+                    closestSlide = slide;
+                    closestDistance = distance;
+                }
+            });
+        
+            smoothScrollToElement(closestSlide);
         }
         
         function smoothScrollToElement(element) {
-            isAnimating = true;
+            isAnimating = true; // Marcar el inicio de la animación
         
             const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-            const startPosition = window.pageYOffset;
-            const distance = elementTop - startPosition;
-            const duration = 500;
-            let startTime = null;
+            window.scrollTo({
+                top: elementTop,
+                behavior: 'smooth'
+            });
         
-            function animation(currentTime) {
-                if (startTime === null) startTime = currentTime;
-                const timeElapsed = currentTime - startTime;
-                const nextScrollPosition = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-        
-                window.scrollTo(0, nextScrollPosition);
-        
-                if (timeElapsed < duration) {
-                    requestAnimationFrame(animation);
-                } else {
-                    isAnimating = false;
-                    allowScrollHandling = true; // Permite el manejo del scroll después de la animación
-                    updateLastScrollPosition(); // Actualizar la posición de scroll después de la animación
-                }
-            }
-        
-            requestAnimationFrame(animation);
+            // Esperar hasta que la animación de scroll termine
+            setTimeout(() => {
+                isAnimating = false; // Marcar el fin de la animación
+            }, 500); // Ajustar según la duración de la animación de scroll
         }
-        
-        function easeInOutQuad(t, b, c, d) {
-            t /= d / 2;
-            if (t < 1) return c / 2 * t * t + b;
-            t--;
-            return -c / 2 * (t * (t - 2) - 1) + b;
-        }
-        
-        // Inicialización de variables
-        let lastScrollPosition = window.pageYOffset;
-        let allowScrollHandling = true;
         
         </script>
-<br>        
+       
        
 </body>
 </html>
