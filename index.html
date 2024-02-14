@@ -325,21 +325,36 @@ nav ul li a:hover {
         }
         
         function smoothScrollToElement(element) {
-            isAnimating = true; // Marcar el inicio de la animación
-        
-            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-            window.scrollTo({
-                top: elementTop,
-                behavior: 'smooth'
-            });
-        
-            // Esperar hasta que la animación de scroll termine
-            setTimeout(() => {
-                isAnimating = false; // Marcar el fin de la animación
-            }, 500); // Ajustar según la duración de la animación de scroll
+        isAnimating = true; // Marcar el inicio de la animación
+
+        const start = window.pageYOffset;
+        const end = element.getBoundingClientRect().top + window.pageYOffset;
+        const distance = end - start;
+        const duration = 900; // Duración más larga para una animación más "suave"
+        let startTime = null;
+
+        function scroll(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const timeElapsed = timestamp - startTime;
+            const progress = Math.min(timeElapsed / duration, 1); // Asegurar que el progreso no exceda 1
+
+            window.scrollTo(0, start + distance * easeInOutCubic(progress));
+
+            if (timeElapsed < duration) {
+                requestAnimationFrame(scroll);
+            } else {
+                isAnimating = false; // Finalizar la animación
+            }
         }
+
+        requestAnimationFrame(scroll);
+    }
+
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
         
-        </script>
+        </script><br>
        
        
 </body>
