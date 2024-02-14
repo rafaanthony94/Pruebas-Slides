@@ -317,26 +317,43 @@ nav ul li a:hover {
 
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     let currentSlideIndex = 0;
     const slides = document.querySelectorAll('.slide');
     let isAnimating = false;
+    let startY = 0; // Para almacenar la posición inicial del toque
 
+    // Prevenir el scroll predeterminado y manejar el scroll de rueda en dispositivos de escritorio
     window.addEventListener('wheel', (event) => {
-        event.preventDefault(); // Prevenir el scroll predeterminado
-        if (isAnimating) return; // Evitar nuevos scrolls mientras se anima
-
+        event.preventDefault();
+        if (isAnimating) return;
         const deltaY = event.deltaY;
         determineSlideChange(deltaY);
     }, { passive: false });
 
+    // Manejar eventos táctiles para dispositivos móviles
+    window.addEventListener('touchstart', (event) => {
+        startY = event.touches[0].clientY;
+    }, { passive: false });
+
+    window.addEventListener('touchend', (event) => {
+        const endY = event.changedTouches[0].clientY;
+        const deltaY = startY - endY;
+        // Simular un evento de rueda basado en el movimiento vertical del toque
+        if (Math.abs(deltaY) > 50) { // Umbral para ignorar movimientos pequeños
+            determineSlideChange(deltaY);
+        }
+    }, { passive: false });
+
     function determineSlideChange(deltaY) {
-        if (deltaY > 0 && currentSlideIndex < slides.length - 1) {
-            currentSlideIndex++;
-            animateScrollToSlide(currentSlideIndex);
-        } else if (deltaY < 0 && currentSlideIndex > 0) {
-            currentSlideIndex--;
-            animateScrollToSlide(currentSlideIndex);
+        if (!isAnimating) {
+            if (deltaY > 0 && currentSlideIndex < slides.length - 1) {
+                currentSlideIndex++;
+                animateScrollToSlide(currentSlideIndex);
+            } else if (deltaY < 0 && currentSlideIndex > 0) {
+                currentSlideIndex--;
+                animateScrollToSlide(currentSlideIndex);
+            }
         }
     }
 
@@ -345,7 +362,7 @@ nav ul li a:hover {
         const targetPosition = targetSlide.offsetTop;
         const startPosition = window.pageYOffset;
         const distance = targetPosition - startPosition;
-        const duration = 500; // Duración de la animación en milisegundos
+        const duration = 500;
         let startTime = null;
 
         isAnimating = true;
@@ -354,16 +371,12 @@ nav ul li a:hover {
             if (!startTime) startTime = currentTime;
             const timeElapsed = currentTime - startTime;
             const progress = Math.min(timeElapsed / duration, 1);
-            
-            // Interpolación lineal: calcular la posición actual de scroll
             const currentPosition = startPosition + distance * progress;
-            
             window.scrollTo(0, currentPosition);
 
             if (timeElapsed < duration) {
                 requestAnimationFrame(animation);
             } else {
-                // Asegurar que terminamos exactamente en la posición objetivo
                 window.scrollTo(0, targetPosition);
                 isAnimating = false;
             }
@@ -373,7 +386,7 @@ nav ul li a:hover {
     }
 });
 
-        </script>
+        </script><br>
         
        
        
