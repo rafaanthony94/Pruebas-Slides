@@ -312,7 +312,7 @@ nav ul li a:hover {
       const slideTop = slide.offsetTop;
       const slideHeight = slide.offsetHeight;
 
-      // Ignore slides outside the visible window
+      // Ignorar slides fuera de la ventana visible
       if (scrollTop + window.innerHeight < slideTop || slideTop + slideHeight < scrollTop) {
         continue;
       }
@@ -324,53 +324,38 @@ nav ul li a:hover {
       return;
     }
 
-    // Find the highest visible slide
+    // Encontrar el slide más alto visible
     const highestSlide = slideHeights.reduce((prev, curr) => (curr.height > prev.height ? curr : prev));
 
     const scrollDiff = Math.abs(scrollTop - highestSlide.top);
-    const direction = scrollTop > highestSlide.top ? 1 : -1; // 1 for down, -1 for up
+    const direction = scrollTop > highestSlide.top ? 1 : -1;
 
-    // Scroll smoothly only if difference is significant and exceeds a threshold
-    const scrollThresholdDown = 100; // Threshold for scrolling down
-    const scrollThresholdUp = 150; // Threshold for scrolling up
+    // Scroll suave solo si la diferencia es significativa y supera un umbral
+    const scrollThresholdDown = 100; // Umbral para scroll hacia abajo
+    const scrollThresholdUp = 150; // Umbral para scroll hacia arriba
     const scrollThreshold = direction > 0 ? scrollThresholdDown : scrollThresholdUp;
 
     if (scrollDiff > scrollThreshold) {
-      // Calculate direction and percentage of scroll based on height
-      const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limit to 50% of viewport
+      // Calcular la dirección y porcentaje de scroll de acuerdo a la altura
+      const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limitar al 50% de la ventana
 
-      // Calculate offset based on 15vh
+      // Calcular el offset basado en 15vh
       const scrollOffset = Math.min(scrollPercentage * direction * window.innerHeight * 0.15, window.innerHeight / 2);
 
-      // Determine the target slide based on direction
-      let targetSlide;
-      if (direction > 0) { // Scrolling down
-        // Find the next slide after the highest
-        let nextSlideIndex = -1;
-        for (let i = 0; i < slides.length; i++) {
-          if (slides[i] === highestSlide) {
-            nextSlideIndex = i + 1;
-            break;
-          }
+     let targetSlideIndex = -1;
+      for (let i = 0; i < slides.length; i++) {
+        if (slides[i] === highestSlide) {
+          targetSlideIndex = direction > 0 ? i + 1 : i - 1; // Adjust for direction
+          break;
         }
-        targetSlide = slides[nextSlideIndex];
-      } else { // Scrolling up
-        // Find the previous slide before the highest
-        let prevSlideIndex = -1;
-        for (let i = 0; i < slides.length; i++) {
-          if (slides[i] === highestSlide) {
-            prevSlideIndex = i - 1;
-            break;
-          }
-        }
-        targetSlide = slides[prevSlideIndex];
       }
+      const targetSlide = slides[targetSlideIndex];
 
-      if (targetSlide) {
-        // Scroll only to the top of the target slide
-        const newScrollTop = targetSlide.offsetTop;
-
-        // Smooth animation with CubicBezier
+      // Ensure valid target slide and use it for scrolling
+      if (targetSlide && targetSlide.offsetTop < scrollTop) {
+        newScrollTop = targetSlide.offsetTop;
+      } else {
+        // Animación suave con CubicBezier
         const easing = (t) => t * t * t;
         const duration = 200;
         let start = Date.now();
@@ -380,9 +365,9 @@ nav ul li a:hover {
           const progress = (now - start) / duration;
           const easedProgress = easing(progress);
 
-          const interpolatedScrollTop = scrollTop + (newScrollTop - scrollTop) * easedProgress;
+          newScrollTop = scrollTop + scrollOffset * easedProgress * direction;
 
-          window.scrollTo({ top: interpolatedScrollTop, behavior: 'smooth' }); // Update position
+          window.scrollTo({ top: newScrollTop, behavior: 'smooth' }); // Actualiza la posición
 
           if (progress < 1) {
             requestAnimationFrame(animateScroll);
@@ -398,6 +383,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script><br>
+    </script>
 </body>
 </html>
