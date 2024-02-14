@@ -285,7 +285,7 @@ nav ul li a:hover {
 
     </div>
     <script>
-  document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
   const slides = document.querySelectorAll('.slide');
   let lastScrollTop = window.scrollY;
   let isScrolling = false;
@@ -339,29 +339,38 @@ nav ul li a:hover {
       // Calcular la dirección y porcentaje de scroll de acuerdo a la altura
       const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limitar al 50% de la ventana
 
-      // Calcular el offset de scroll basado en la altura de la slide
-      const scrollOffset = Math.min(scrollPercentage * direction * highestSlide.height, window.innerHeight / 2);
+      // Calcular el offset basado en 15vh
+      const scrollOffset = Math.min(scrollPercentage * direction * window.innerHeight * 0.15, window.innerHeight / 2);
 
-      // Animación suave con CubicBezier
-      const easing = (t) => t * t * t;
-      const duration = 200;
-      let start = Date.now();
+      // Comprobar si se llega a la siguiente slide
+      const nextSlideIndex = slides.indexOf(highestSlide) + 1;
+      const nextSlide = slides[nextSlideIndex];
 
-      const animateScroll = () => {
-        const now = Date.now();
-        const progress = (now - start) / duration;
-        const easedProgress = easing(progress);
+      if (nextSlide && newScrollTop + scrollOffset * easedProgress * direction >= nextSlide.offsetTop) {
+        // Scroll solo hasta la parte superior de la siguiente slide
+        newScrollTop = nextSlide.offsetTop;
+      } else {
+        // Animación suave con CubicBezier
+        const easing = (t) => t * t * t;
+        const duration = 200;
+        let start = Date.now();
 
-        const newScrollTop = scrollTop + scrollOffset * easedProgress * direction;
+        const animateScroll = () => {
+          const now = Date.now();
+          const progress = (now - start) / duration;
+          const easedProgress = easing(progress);
 
-        window.scrollTo({ top: newScrollTop, behavior: 'auto' });
+          newScrollTop = scrollTop + scrollOffset * easedProgress * direction;
 
-        if (progress < 1) {
-          requestAnimationFrame(animateScroll);
-        }
-      };
+          window.scrollTo({ top: newScrollTop, behavior: 'auto' }); // Actualiza la posición
 
-      animateScroll();
+          if (progress < 1) {
+            requestAnimationFrame(animateScroll);
+          }
+        };
+
+        animateScroll();
+      }
     }
 
     lastScrollTop = scrollTop;
@@ -369,6 +378,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script><br>
+    </script>
 </body>
 </html>
