@@ -195,7 +195,10 @@ nav ul li a:hover {
         padding: 30px 15px;
     }
     
-    #sobre-nosotros img, #servicios img {
+    #sobre-nosotros img {
+        max-width: 250px; /* Ajusta el ancho máximo en dispositivos móviles */
+    }
+    #servicios img {
         max-width: 150px; /* Ajusta el ancho máximo en dispositivos móviles */
     }
     .content-wrapper {
@@ -314,86 +317,73 @@ nav ul li a:hover {
 
     </div>
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
-    let lastScrollY = window.scrollY;
-    let isAutoScrolling = false;
+     document.addEventListener('DOMContentLoaded', () => {
+    let isScrolling;
+    let allowScroll = true; // Permitir o bloquear el scroll
 
     window.addEventListener('scroll', () => {
-        if (isAutoScrolling) {
-            // Si estamos en medio de un scroll automático, no hacer nada más
-            isAutoScrolling = false;
+        if (!allowScroll) {
+            // Bloquear el scroll mientras se está animando hacia otra slide
             return;
         }
 
-        const direction = window.scrollY > lastScrollY ? 'down' : 'up';
-        lastScrollY = window.scrollY; // Actualizar la última posición de scroll conocida
+        window.clearTimeout(isScrolling);
 
-        clearTimeout(isAutoScrolling); // Limpiar el timeout anterior si existe
-
-        // Establecer un timeout para evitar múltiples ejecuciones durante el scroll
-        isAutoScrolling = setTimeout(() => {
+        isScrolling = setTimeout(() => {
+            const direction = window.scrollY > lastScrollY ? 'down' : 'up';
             moveToSlide(direction);
-        }, 150); // Un pequeño retardo para detectar el fin del scroll
+        }, 66); // Detectar el fin del scroll
+
+        allowScroll = false; // Bloquear nuevos scrolls hasta que termine la animación
     });
+
+    let lastScrollY = window.scrollY;
 
     function moveToSlide(direction) {
         const slides = document.querySelectorAll('.slide');
-        let currentSlideIndex = findCurrentSlideIndex(slides);
+        let currentSlideIndex = findCurrentSlideIndex(slides, window.scrollY);
 
         if (direction === 'down' && currentSlideIndex < slides.length - 1) {
             smoothScrollToElement(slides[currentSlideIndex + 1]);
         } else if (direction === 'up' && currentSlideIndex > 0) {
             smoothScrollToElement(slides[currentSlideIndex - 1]);
+        } else {
+            // Si no es posible moverse más, desbloquear el scroll
+            allowScroll = true;
         }
     }
 
-    function findCurrentSlideIndex(slides) {
-        const currentScrollY = window.scrollY;
+    function findCurrentSlideIndex(slides, scrollY) {
         for (let i = 0; i < slides.length; i++) {
-            const slideTop = slides[i].offsetTop;
-            const slideBottom = slideTop + slides[i].offsetHeight;
+            const slide = slides[i];
+            const slideTop = slide.offsetTop;
+            const slideHeight = slide.offsetHeight;
 
-            if (currentScrollY >= slideTop && currentScrollY < slideBottom) {
-                return i; // Devuelve el índice de la slide actual
+            if (scrollY >= slideTop && scrollY < slideTop + slideHeight) {
+                return i;
             }
         }
-        return 0; // Por defecto, devuelve 0 si no se encuentra ninguna coincidencia
+        return 0; // Retornar el primer slide si no se encuentra ninguno (por seguridad)
     }
 
     function smoothScrollToElement(element) {
-        const start = window.pageYOffset;
         const end = element.offsetTop;
-        const distance = end - start;
-        const duration = 1000; // Duración más larga para el scroll (1 segundo)
-        let startTime = null;
 
-        function scroll(timestamp) {
-            if (!startTime) startTime = timestamp;
+        window.scrollTo({
+            top: end,
+            behavior: 'smooth'
+        });
 
-            const timeElapsed = timestamp - startTime;
-            const progress = Math.min(timeElapsed / duration, 1);
-
-            const easeInOutQuad = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-            const easedProgress = easeInOutQuad(progress);
-
-            window.scrollTo(0, start + distance * easedProgress);
-
-            if (timeElapsed < duration) {
-                requestAnimationFrame(scroll);
-            } else {
-                // Finalizar la animación y permitir un breve retardo antes de otro scroll
-                isAutoScrolling = false;
-                setTimeout(() => {
-                    isAutoScrolling = true; // Reactivar el scroll automático después de una pausa
-                }, 200); // Microparada de 200ms antes de permitir el siguiente scroll
-            }
-        }
-
-        requestAnimationFrame(scroll);
+        // Esperar a que termine el scroll suave para desbloquear el scroll
+        setTimeout(() => {
+            lastScrollY = window.scrollY; // Actualizar la última posición de scroll
+            allowScroll = true; // Desbloquear el scroll
+        }, 1000); // Asumiendo que la animación dura menos de 1 segundo
     }
 });
 
-        </script>
+
+        </script><br>
        
        
 </body>
