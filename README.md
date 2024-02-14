@@ -1,2 +1,0 @@
-# Pruebas Slides
- Pruebas Slides
