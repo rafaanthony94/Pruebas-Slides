@@ -285,74 +285,84 @@ nav ul li a:hover {
 
     </div>
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    let isScrolling;
-    let isAnimating = false; // Bandera para controlar si estamos animando el scroll
-    let allowScrollHandling = true; // Nueva bandera para controlar el manejo de scroll después de animar
-
-    window.addEventListener('scroll', () => {
-        if (isAnimating || !allowScrollHandling) return; // Evitar ejecutar el scroll programado si ya estamos animando o en período de enfriamiento
-
-        window.clearTimeout(isScrolling);
-
-        isScrolling = setTimeout(() => {
+        document.addEventListener('DOMContentLoaded', () => {
+            let isScrolling;
+            let isAnimating = false; // Controla si estamos animando el scroll
+            let lastScrollPosition = 0; // Almacena la última posición de scroll para detectar cambios
+        
+            window.addEventListener('scroll', () => {
+                // Si se está animando, no hacer nada
+                if (isAnimating) return;
+        
+                // Detectar si el scroll es manual comparando la posición actual con la última almacenada
+                const currentScrollPosition = window.pageYOffset;
+                if (Math.abs(currentScrollPosition - lastScrollPosition) > 5) { // Umbral de 5px para ignorar pequeños scrolls automáticos
+                    window.clearTimeout(isScrolling);
+        
+                    isScrolling = setTimeout(() => {
+                        // Solo ejecutar si no hay una animación en curso
+                        if (!isAnimating) {
+                            autoScrollToClosestSlide();
+                        }
+                    }, 66);
+                }
+        
+                lastScrollPosition = currentScrollPosition; // Actualizar la última posición de scroll
+            });
+        });
+        
+        function autoScrollToClosestSlide() {
             const slides = document.querySelectorAll('.slide');
             let targetSlide = slides[0];
-            let minVisibleHeight = window.innerHeight; // Inicializar con la altura total del viewport
-
+            let minVisibleHeight = window.innerHeight;
+        
+            // Identificar el slide objetivo como el más cercano al centro del viewport
             for (const slide of slides) {
                 const rect = slide.getBoundingClientRect();
                 const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-
-                // Buscar el slide con la menor altura visible en el viewport
-                if (visibleHeight < minVisibleHeight && visibleHeight > 0) { // Asegurarse de que la slide sea parcialmente visible
+                if (visibleHeight < minVisibleHeight && visibleHeight > 0) {
                     targetSlide = slide;
                     minVisibleHeight = visibleHeight;
                 }
             }
-
+        
             smoothScrollToElement(targetSlide);
-        }, 66);
-    });
-});
-
-function smoothScrollToElement(element) {
-    isAnimating = true; // Establecer la bandera a verdadero para indicar que estamos animando
-    allowScrollHandling = false; // Desactivar el manejo de scroll durante la animación
-
-    const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-    const startPosition = window.pageYOffset;
-    const distance = elementTop - startPosition;
-    const duration = 500; // Duración de la animación en milisegundos
-    let startTime = null;
-
-    function animation(currentTime) {
-        if (startTime === null) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const nextScrollPosition = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-
-        window.scrollTo(0, nextScrollPosition);
-
-        if (timeElapsed < duration) {
-            requestAnimationFrame(animation);
-        } else {
-            isAnimating = false; // Restablecer la bandera cuando la animación haya terminado
-            setTimeout(() => {
-                allowScrollHandling = true; // Reactivar el manejo de scroll después de un breve retardo
-            }, 100); // Establecer un retardo antes de permitir otro manejo de scroll
         }
-    }
-
-    requestAnimationFrame(animation);
-}
-
-function easeInOutQuad(t, b, c, d) {
-    t /= d / 2;
-    if (t < 1) return c / 2 * t * t + b;
-    t--;
-    return -c / 2 * (t * (t - 2) - 1) + b;
-}
-
-    </script><br>
+        
+        function smoothScrollToElement(element) {
+            isAnimating = true; // Indicar que se inicia una animación
+        
+            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+            const startPosition = window.pageYOffset;
+            const distance = elementTop - startPosition;
+            const duration = 500;
+            let startTime = null;
+        
+            function animation(currentTime) {
+                if (startTime === null) startTime = currentTime;
+                const timeElapsed = currentTime - startTime;
+                const nextScrollPosition = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+        
+                window.scrollTo(0, nextScrollPosition);
+        
+                if (timeElapsed < duration) {
+                    requestAnimationFrame(animation);
+                } else {
+                    isAnimating = false; // Finalizar la animación
+                    // No es necesario deshabilitar el manejo del scroll aquí; la lógica de detección de scroll manual lo gestiona
+                }
+            }
+        
+            requestAnimationFrame(animation);
+        }
+        
+        function easeInOutQuad(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+        </script>
+       
 </body>
 </html>
