@@ -288,6 +288,7 @@ nav ul li a:hover {
         document.addEventListener('DOMContentLoaded', () => {
             const slides = document.querySelectorAll('.slide');
             let currentSlideIndex = 0;
+            let lastScrollPosition = window.scrollY;
             let isScrolling = false;
     
             window.addEventListener('scroll', () => {
@@ -308,32 +309,36 @@ nav ul li a:hover {
                         const slideTop = slide.offsetTop;
                         const slideHeight = slide.offsetHeight;
     
-                        // Desplazamiento hacia abajo si se ha superado el 35vh del slide actual
-                        if (scrollPosition > slideTop + (slideHeight * 0.35)) {
-                            const nextSlideIndex = currentSlideIndex + 1;
-                            if (nextSlideIndex < slides.length) {
+                        // Desplazamiento hacia abajo
+                        if (scrollPosition > lastScrollPosition) {
+                            if (scrollPosition > slideTop + (slideHeight * 0.35)) {
+                                const nextSlideIndex = currentSlideIndex + 1;
+                                if (nextSlideIndex < slides.length) {
+                                    window.scrollTo({
+                                        top: slides[nextSlideIndex].offsetTop,
+                                        behavior: 'smooth'
+                                    });
+                                }
+                            }
+                        }
+                        // Desplazamiento hacia arriba
+                        else {
+                            if (scrollPosition < slideTop - (window.innerHeight * 0.35) && currentSlideIndex > 0) {
+                                const prevSlideIndex = currentSlideIndex - 1;
                                 window.scrollTo({
-                                    top: slides[nextSlideIndex].offsetTop,
+                                    top: slides[prevSlideIndex].offsetTop,
                                     behavior: 'smooth'
                                 });
                             }
                         }
-    
-                        // Desplazamiento hacia arriba si se ha superado el 35vh del slide anterior
-                        if (scrollPosition < slideTop - (window.innerHeight * 0.35) && currentSlideIndex > 0) {
-                            const prevSlideIndex = currentSlideIndex - 1;
-                            window.scrollTo({
-                                top: slides[prevSlideIndex].offsetTop,
-                                behavior: 'smooth'
-                            });
-                        }
+                        lastScrollPosition = scrollPosition;
                         isScrolling = false;
                     }, 200);
                 }
             });
         });
     </script>
-    
+<br>    
     
 </body>
 </html>
