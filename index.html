@@ -330,12 +330,13 @@ nav ul li a:hover {
         if (scrollDelta > 0 && scrollPosition - closestSlideTop > scrollThreshold) {
             // Scroll hacia abajo, mover al siguiente slide si existe
             if (closestSlideIndex < slides.length - 1) {
-                window.scrollTo({top: slides[closestSlideIndex + 1].offsetTop, behavior: 'smooth'});
+                window.scrollTo({top: slides[closestSlideIndex - 1].offsetTop, behavior: 'smooth'});
             }
         } else if (scrollDelta < 0 && closestSlideTop + slideHeight - scrollPosition > scrollThreshold) {
             // Scroll hacia arriba, mover al slide anterior si existe y se ha superado el umbral
             if (closestSlideIndex > 0) {
-                window.scrollTo({top: slides[closestSlideIndex - 1].offsetTop, behavior: 'smooth'});
+                window.scrollTo({top: slides[closestSlideIndex + 1].offsetTop, behavior: 'smooth'});
+
             }
         }
 
@@ -351,5 +352,6 @@ nav ul li a:hover {
 
 
     </script>
+    <br>
 </body>
 </html>
