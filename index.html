@@ -285,59 +285,54 @@ nav ul li a:hover {
 
     </div>
     <script>
-        // Función para obtener la altura de la ventana
-        function getWindowHeight() {
-            return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-        }
-    
-        // Animación de entrada de las diapositivas al hacer scroll
-        document.addEventListener('scroll', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const slides = document.querySelectorAll('.slide');
-            slides.forEach(slide => {
-                const slideTop = slide.getBoundingClientRect().top;
-                const slideHeight = slide.clientHeight;
-                if (slideTop < getWindowHeight() - slideHeight / 2) {
-                    slide.style.opacity = 1;
-                }
+            let currentSlideIndex = 0;
+
+            window.addEventListener('scroll', () => {
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+
+                slides.forEach((slide, index) => {
+                    const slideTop = slide.offsetTop;
+                    const slideHeight = slide.offsetHeight;
+
+                    if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight) {
+                        currentSlideIndex = index;
+                    }
+                });
             });
-        });
-    
-        // Desplazamiento automático entre diapositivas al hacer scroll
-        document.addEventListener('scroll', () => {
-            const slides = document.querySelectorAll('.slide');
-            let currentIndex = 0;
-            slides.forEach((slide, index) => {
-                const slideTop = slide.getBoundingClientRect().top;
-                if (slideTop < getWindowHeight() / 2 && slideTop > -getWindowHeight() / 2) {
-                    currentIndex = index;
+
+            setInterval(() => {
+                const windowHeight = window.innerHeight;
+                const scrollPosition = window.scrollY;
+                const slide = slides[currentSlideIndex];
+
+                const slideTop = slide.offsetTop;
+                const slideHeight = slide.offsetHeight;
+
+                // Desplazamiento hacia abajo si se ha superado el 35vh del slide actual
+                if (scrollPosition > slideTop + (slideHeight * 0.35)) {
+                    const nextSlideIndex = currentSlideIndex + 1;
+                    if (nextSlideIndex < slides.length) {
+                        window.scrollTo({
+                            top: slides[nextSlideIndex].offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
                 }
-            });
-    
-            // Controlar el desplazamiento automático hacia abajo
-            if (currentIndex < slides.length - 1) {
-                const currentSlideTop = slides[currentIndex].getBoundingClientRect().top;
-                if (currentSlideTop < 35) {
+
+                // Desplazamiento hacia arriba si se ha superado el 35vh del slide anterior
+                if (scrollPosition < slideTop + (windowHeight * 0.65) && currentSlideIndex > 0) {
+                    const prevSlideIndex = currentSlideIndex - 1;
                     window.scrollTo({
-                        top: slides[currentIndex + 1].offsetTop,
+                        top: slides[prevSlideIndex].offsetTop,
                         behavior: 'smooth'
                     });
                 }
-            }
-    
-            // Controlar el desplazamiento automático hacia arriba
-            if (currentIndex > 0) {
-                const currentSlideBottom = slides[currentIndex].getBoundingClientRect().bottom;
-                if (currentSlideBottom < getWindowHeight() + 35) {
-                    window.scrollTo({
-                        top: slides[currentIndex - 1].offsetTop,
-                        behavior: 'smooth'
-                    });
-                }
-            }
+            }, 100);
         });
     </script>
-<br>    
-    
     
 </body>
 </html>
