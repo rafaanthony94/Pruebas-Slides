@@ -291,61 +291,47 @@ nav ul li a:hover {
     let lastScrollPosition = window.scrollY;
     let isScrolling = false;
 
-    document.addEventListener('DOMContentLoaded', () => {
-    const slides = document.querySelectorAll('.slide');
-    let isAnimating = false;
-
-    const scrollToElement = (element) => {
-        const start = window.scrollY;
-        const end = element.offsetTop;
-        const change = end - start;
-        const duration = 900;
-        let startTime = null;
-
-        function animateScroll(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const timeElapsed = timestamp - startTime;
-            const progress = Math.min(timeElapsed / duration, 1);
-
-            window.scrollTo(0, start + change * progress);
-
-            if (timeElapsed < duration) {
-                requestAnimationFrame(animateScroll);
-            } else {
-                isAnimating = false;
-            }
-        }
-
-        requestAnimationFrame(animateScroll);
-    };
-
     window.addEventListener('scroll', () => {
-        if (isAnimating) return;
+        if (!isScrolling) {
+            isScrolling = true;
+            setTimeout(() => {
+                const scrollPosition = window.scrollY;
+                let slideFound = false;
 
-        const scrollPosition = window.scrollY;
-        let targetSlide;
+                slides.forEach((slide, index) => {
+                    const slideTop = slide.offsetTop;
+                    const slideHeight = slide.offsetHeight;
 
-        slides.forEach((slide, index) => {
-            const slideTop = slide.offsetTop;
-            const slideHeight = slide.offsetHeight;
-            if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight) {
-                const direction = scrollPosition - slideTop > slideHeight / 2 ? 1 : -1;
-                const targetIndex = index + direction;
-                if (targetIndex >= 0 && targetIndex < slides.length) {
-                    targetSlide = slides[targetIndex];
-                }
-            }
-        });
+                    if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight && !slideFound) {
+                        currentSlideIndex = index;
+                        slideFound = true; // Esto evita cambios adicionales una vez que se encuentra el slide actual.
+                    }
+                });
 
-        if (targetSlide) {
-            isAnimating = true;
-            scrollToElement(targetSlide);
+                const slide = slides[currentSlideIndex];
+                const slideTop = slide.offsetTop;
+                const slideHeight = slide.offsetHeight;
+
+                // Desplazamiento hacia abajo
+                    if (scrollPosition > slideTop + (slideHeight * 0.35)) {
+                        const nextSlideIndex = currentSlideIndex + 1;
+                        if (nextSlideIndex < slides.length) {
+                            window.scrollTo({
+                                top: slides[nextSlideIndex].offsetTop,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                
+                lastScrollPosition = scrollPosition;
+                isScrolling = false;
+            }, 200);
         }
     });
 });
 
-
     </script>
+    <br>
     
 </body>
 </html>
