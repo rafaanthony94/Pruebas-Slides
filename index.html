@@ -317,68 +317,45 @@ nav ul li a:hover {
 
     </div>
     <script>
-     document.addEventListener('DOMContentLoaded', () => {
-    let isScrolling;
-    let allowScroll = true;
-
-    window.addEventListener('scroll', () => {
-        if (!allowScroll) {
-            return;
-        }
-
-        window.clearTimeout(isScrolling);
-
-        isScrolling = setTimeout(() => {
-            const direction = window.scrollY > lastScrollY ? 'down' : 'up';
-            lastScrollY = window.scrollY; // Mover aquí la actualización de lastScrollY
-            moveToSlide(direction);
-        }, 66);
-
-        allowScroll = false;
-    });
-
-    let lastScrollY = window.scrollY;
-
-    function moveToSlide(direction) {
-        const slides = document.querySelectorAll('.slide');
-        let currentSlideIndex = findCurrentSlideIndex(slides, window.scrollY);
-
-        if (direction === 'down' && currentSlideIndex < slides.length - 1) {
-            smoothScrollToElement(slides[currentSlideIndex + 1]);
-        } else if (direction === 'up' && currentSlideIndex > 0) {
-            smoothScrollToElement(slides[currentSlideIndex - 1]);
-        }
-        // No necesitamos actualizar lastScrollY o alterar allowScroll aquí, ya se maneja antes y después del scroll
-    }
-
-    function findCurrentSlideIndex(slides, scrollY) {
-        for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i];
-            const slideTop = slide.offsetTop;
-            const slideHeight = slide.offsetHeight;
-
-            if (scrollY >= slideTop && scrollY < slideTop + slideHeight) {
-                return i;
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentSlideIndex = 0;
+            const slides = document.querySelectorAll('.slide');
+            let isScrollingAllowed = true;
+        
+            // Desactivar el scroll predeterminado
+            window.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                handleScroll(event.deltaY);
+            }, { passive: false });
+        
+            function handleScroll(deltaY) {
+                if (!isScrollingAllowed) return;
+        
+                isScrollingAllowed = false; // Bloquear más scroll hasta que termine la animación
+                if (deltaY > 0) { // Scroll hacia abajo
+                    if (currentSlideIndex < slides.length - 1) currentSlideIndex++;
+                } else if (deltaY < 0) { // Scroll hacia arriba
+                    if (currentSlideIndex > 0) currentSlideIndex--;
+                }
+                smoothScrollToSlide(currentSlideIndex);
+        
+                setTimeout(() => {
+                    isScrollingAllowed = true; // Re-activar scroll después de la animación
+                }, 1000); // Coincide con la duración de la animación de scroll
             }
-        }
-        return 0;
-    }
-
-    function smoothScrollToElement(element) {
-        const end = element.offsetTop;
-
-        window.scrollTo({
-            top: end,
-            behavior: 'smooth'
+        
+            function smoothScrollToSlide(slideIndex) {
+                const targetSlide = slides[slideIndex];
+                if (!targetSlide) return;
+        
+                window.scrollTo({
+                    top: targetSlide.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
         });
-
-        setTimeout(() => {
-            allowScroll = true; // Solo reactivar el scroll después de la animación
-        }, 1000);
-    }
-});
-
-        </script>
+        </script><br>
+        
        
        
 </body>
