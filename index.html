@@ -285,13 +285,18 @@ nav ul li a:hover {
 
     </div>
     <script>
+        // Función para obtener la altura de la ventana
+        function getWindowHeight() {
+            return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        }
+    
         // Animación de entrada de las diapositivas al hacer scroll
         document.addEventListener('scroll', () => {
             const slides = document.querySelectorAll('.slide');
             slides.forEach(slide => {
                 const slideTop = slide.getBoundingClientRect().top;
                 const slideHeight = slide.clientHeight;
-                if (slideTop < window.innerHeight - slideHeight / 2) {
+                if (slideTop < getWindowHeight() - slideHeight / 2) {
                     slide.style.opacity = 1;
                 }
             });
@@ -303,15 +308,15 @@ nav ul li a:hover {
             let currentIndex = 0;
             slides.forEach((slide, index) => {
                 const slideTop = slide.getBoundingClientRect().top;
-                if (slideTop < window.innerHeight / 2 && slideTop > -window.innerHeight / 2) {
+                if (slideTop < getWindowHeight() / 2 && slideTop > -getWindowHeight() / 2) {
                     currentIndex = index;
                 }
             });
     
             // Controlar el desplazamiento automático hacia abajo
             if (currentIndex < slides.length - 1) {
-                const currentSlideBottom = slides[currentIndex].getBoundingClientRect().bottom;
-                if (currentSlideBottom < window.innerHeight + 35) {
+                const currentSlideTop = slides[currentIndex].getBoundingClientRect().top;
+                if (currentSlideTop < 35) {
                     window.scrollTo({
                         top: slides[currentIndex + 1].offsetTop,
                         behavior: 'smooth'
@@ -321,8 +326,8 @@ nav ul li a:hover {
     
             // Controlar el desplazamiento automático hacia arriba
             if (currentIndex > 0) {
-                const prevSlideTop = slides[currentIndex - 1].getBoundingClientRect().top;
-                if (prevSlideTop > 35) {
+                const currentSlideBottom = slides[currentIndex].getBoundingClientRect().bottom;
+                if (currentSlideBottom < getWindowHeight() + 35) {
                     window.scrollTo({
                         top: slides[currentIndex - 1].offsetTop,
                         behavior: 'smooth'
@@ -331,6 +336,7 @@ nav ul li a:hover {
             }
         });
     </script>
+<br>    
     
     
 </body>
