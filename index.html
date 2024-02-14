@@ -286,70 +286,58 @@ nav ul li a:hover {
     </div>
     <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const slides = document.querySelectorAll('.slide');
-    let lastScrollPosition = window.scrollY;
-    let isScrolling;
+  const slides = document.querySelectorAll('.slide');
+  let lastScrollTop = window.scrollY;
+  let isScrolling = false;
 
-    const debounce = (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
+  const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
     };
+  };
 
-    const handleScroll = () => {
-        if (isScrolling) return;
-        isScrolling = true;
+  const handleScroll = debounce(() => {
+    isScrolling = false;
 
-        const scrollPosition = window.scrollY;
-        let closestSlideIndex = 0;
-        let smallestDistance = Number.POSITIVE_INFINITY;
+    const scrollTop = window.scrollY;
+    const slideHeights = [];
 
-        slides.forEach((slide, index) => {
-            const slideTop = slide.offsetTop;
-            const distance = Math.abs(scrollPosition - slideTop);
-            if (distance < smallestDistance) {
-                smallestDistance = distance;
-                closestSlideIndex = index;
-            }
-        });
+    for (const slide of slides) {
+      const slideTop = slide.offsetTop;
+      const slideHeight = slide.offsetHeight;
 
-        const closestSlide = slides[closestSlideIndex];
-        const closestSlideTop = closestSlide.offsetTop;
-        const slideHeight = closestSlide.offsetHeight;
-        const scrollDelta = scrollPosition - lastScrollPosition;
+      // Ignorar slides fuera de la ventana visible
+      if (scrollTop + window.innerHeight < slideTop || slideTop + slideHeight < scrollTop) {
+        continue;
+      }
 
-        // Definir un umbral mínimo de desplazamiento para activar el autoscroll
-        const scrollThreshold = slideHeight * 0.35;
+      slideHeights.push({ top: slideTop, height: slideHeight });
+    }
 
-        if (scrollDelta > 0 && scrollPosition - closestSlideTop > scrollThreshold) {
-            // Scroll hacia abajo, mover al siguiente slide si existe
-            if (closestSlideIndex < slides.length - 1) {
-                window.scrollTo({top: slides[closestSlideIndex + 1].offsetTop, behavior: 'smooth'});
-            }
-        } else if (scrollDelta < 0 && closestSlideTop + slideHeight - scrollPosition > scrollThreshold) {
-            // Scroll hacia arriba, mover al slide anterior si existe y se ha superado el umbral
-            if (closestSlideIndex > 0) {
-                window.scrollTo({top: slides[closestSlideIndex - 1].offsetTop, behavior: 'smooth'});
-            }
-        }
+    if (slideHeights.length === 0) {
+      return;
+    }
 
-        lastScrollPosition = scrollPosition;
+    // Encontrar el slide más alto visible
+    const highestSlide = slideHeights.reduce((prev, curr) => (curr.height > prev.height ? curr : prev));
 
-        setTimeout(() => {
-            isScrolling = false;
-        }, 600);
-    };
+    // Desplazarse suavemente al slide más alto solo si la diferencia supera un umbral
+    const scrollThreshold = 100; // Ajustar el umbral según se quiera
+    if (Math.abs(scrollTop - highestSlide.top) > scrollThreshold) {
+      window.scrollTo({ top: highestSlide.top, behavior: 'smooth' });
+    }
 
-    window.addEventListener('scroll', debounce(handleScroll, 100));
+    lastScrollTop = scrollTop;
+  }, 200);
+
+  window.addEventListener('scroll', handleScroll);
 });
-
-
-    </script>
+    </script><br>
 </body>
 </html>
