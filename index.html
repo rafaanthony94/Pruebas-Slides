@@ -343,7 +343,7 @@ nav ul li a:hover {
       const scrollOffset = Math.min(scrollPercentage * direction * window.innerHeight * 0.15, window.innerHeight / 2);
 
       // Comprobar si se llega a la siguiente slide
-      const nextSlideIndex = slides.findIndex(highestSlide) + 1;
+      const nextSlideIndex = Array.from(slides).findIndex(highestSlide) + 1;
       const nextSlide = slides[nextSlideIndex];
 
       if (nextSlide && newScrollTop + scrollOffset * easedProgress * direction >= nextSlide.offsetTop) {
@@ -378,6 +378,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script>
+    </script><br>
 </body>
 </html>
