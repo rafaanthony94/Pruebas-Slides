@@ -288,51 +288,51 @@ nav ul li a:hover {
         document.addEventListener('DOMContentLoaded', () => {
             const slides = document.querySelectorAll('.slide');
             let currentSlideIndex = 0;
+            let isScrolling = false;
 
             window.addEventListener('scroll', () => {
-                const scrollPosition = window.scrollY;
-                const windowHeight = window.innerHeight;
+                if (!isScrolling) {
+                    isScrolling = true;
+                    setTimeout(() => {
+                        const scrollPosition = window.scrollY;
+                        slides.forEach((slide, index) => {
+                            const slideTop = slide.offsetTop;
+                            const slideHeight = slide.offsetHeight;
 
-                slides.forEach((slide, index) => {
-                    const slideTop = slide.offsetTop;
-                    const slideHeight = slide.offsetHeight;
-
-                    if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight) {
-                        currentSlideIndex = index;
-                    }
-                });
-            });
-
-            setInterval(() => {
-                const windowHeight = window.innerHeight;
-                const scrollPosition = window.scrollY;
-                const slide = slides[currentSlideIndex];
-
-                const slideTop = slide.offsetTop;
-                const slideHeight = slide.offsetHeight;
-
-                // Desplazamiento hacia abajo si se ha superado el 35vh del slide actual
-                if (scrollPosition > slideTop + (slideHeight * 0.35)) {
-                    const nextSlideIndex = currentSlideIndex + 1;
-                    if (nextSlideIndex < slides.length) {
-                        window.scrollTo({
-                            top: slides[nextSlideIndex].offsetTop,
-                            behavior: 'smooth'
+                            if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight) {
+                                currentSlideIndex = index;
+                            }
                         });
-                    }
-                }
 
-                // Desplazamiento hacia arriba si se ha superado el 35vh del slide anterior
-                if (scrollPosition < slideTop + (windowHeight * 0.65) && currentSlideIndex > 0) {
-                    const prevSlideIndex = currentSlideIndex - 1;
-                    window.scrollTo({
-                        top: slides[prevSlideIndex].offsetTop,
-                        behavior: 'smooth'
-                    });
+                        const slide = slides[currentSlideIndex];
+                        const slideTop = slide.offsetTop;
+                        const slideHeight = slide.offsetHeight;
+
+                        // Desplazamiento hacia abajo si se ha superado el 35vh del slide actual
+                        if (scrollPosition > slideTop + (slideHeight * 0.35)) {
+                            const nextSlideIndex = currentSlideIndex + 1;
+                            if (nextSlideIndex < slides.length) {
+                                window.scrollTo({
+                                    top: slides[nextSlideIndex].offsetTop,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }
+
+                        // Desplazamiento hacia arriba si se ha superado el 35vh del slide anterior
+                        if (scrollPosition < slideTop + (window.innerHeight * 0.65) && currentSlideIndex > 0) {
+                            const prevSlideIndex = currentSlideIndex - 1;
+                            window.scrollTo({
+                                top: slides[prevSlideIndex].offsetTop,
+                                behavior: 'smooth'
+                            });
+                        }
+                        isScrolling = false;
+                    }, 200);
                 }
-            }, 100);
+            });
         });
-    </script>
+    </script><br>
     
 </body>
 </html>
