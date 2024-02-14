@@ -361,17 +361,39 @@ nav ul li a:hover {
     }
 
     function smoothScrollToElement(element) {
-        isAutoScrolling = true; // Indicar que estamos realizando un scroll automático
-        const elementTop = element.offsetTop;
+        const start = window.pageYOffset;
+        const end = element.offsetTop;
+        const distance = end - start;
+        const duration = 1000; // Duración más larga para el scroll (1 segundo)
+        let startTime = null;
 
-        window.scrollTo({
-            top: elementTop,
-            behavior: 'smooth'
-        });
+        function scroll(timestamp) {
+            if (!startTime) startTime = timestamp;
+
+            const timeElapsed = timestamp - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+
+            const easeInOutQuad = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            const easedProgress = easeInOutQuad(progress);
+
+            window.scrollTo(0, start + distance * easedProgress);
+
+            if (timeElapsed < duration) {
+                requestAnimationFrame(scroll);
+            } else {
+                // Finalizar la animación y permitir un breve retardo antes de otro scroll
+                isAutoScrolling = false;
+                setTimeout(() => {
+                    isAutoScrolling = true; // Reactivar el scroll automático después de una pausa
+                }, 200); // Microparada de 200ms antes de permitir el siguiente scroll
+            }
+        }
+
+        requestAnimationFrame(scroll);
     }
 });
 
-        </script><br>
+        </script>
        
        
 </body>
