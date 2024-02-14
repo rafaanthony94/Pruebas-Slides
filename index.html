@@ -317,44 +317,63 @@ nav ul li a:hover {
 
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentSlideIndex = 0;
-            const slides = document.querySelectorAll('.slide');
-            let isScrollingAllowed = true;
-        
-            // Desactivar el scroll predeterminado
-            window.addEventListener('wheel', (event) => {
-                event.preventDefault();
-                handleScroll(event.deltaY);
-            }, { passive: false });
-        
-            function handleScroll(deltaY) {
-                if (!isScrollingAllowed) return;
-        
-                isScrollingAllowed = false; // Bloquear más scroll hasta que termine la animación
-                if (deltaY > 0) { // Scroll hacia abajo
-                    if (currentSlideIndex < slides.length - 1) currentSlideIndex++;
-                } else if (deltaY < 0) { // Scroll hacia arriba
-                    if (currentSlideIndex > 0) currentSlideIndex--;
-                }
-                smoothScrollToSlide(currentSlideIndex);
-        
-                setTimeout(() => {
-                    isScrollingAllowed = true; // Re-activar scroll después de la animación
-                }, 1000); // Coincide con la duración de la animación de scroll
+      document.addEventListener('DOMContentLoaded', () => {
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    let isAnimating = false;
+
+    window.addEventListener('wheel', (event) => {
+        event.preventDefault(); // Prevenir el scroll predeterminado
+        if (isAnimating) return; // Evitar nuevos scrolls mientras se anima
+
+        const deltaY = event.deltaY;
+        determineSlideChange(deltaY);
+    }, { passive: false });
+
+    function determineSlideChange(deltaY) {
+        if (deltaY > 0 && currentSlideIndex < slides.length - 1) {
+            currentSlideIndex++;
+            animateScrollToSlide(currentSlideIndex);
+        } else if (deltaY < 0 && currentSlideIndex > 0) {
+            currentSlideIndex--;
+            animateScrollToSlide(currentSlideIndex);
+        }
+    }
+
+    function animateScrollToSlide(slideIndex) {
+        const targetSlide = slides[slideIndex];
+        const targetPosition = targetSlide.offsetTop;
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = 500; // Duración de la animación en milisegundos
+        let startTime = null;
+
+        isAnimating = true;
+
+        function animation(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            
+            // Interpolación lineal: calcular la posición actual de scroll
+            const currentPosition = startPosition + distance * progress;
+            
+            window.scrollTo(0, currentPosition);
+
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animation);
+            } else {
+                // Asegurar que terminamos exactamente en la posición objetivo
+                window.scrollTo(0, targetPosition);
+                isAnimating = false;
             }
-        
-            function smoothScrollToSlide(slideIndex) {
-                const targetSlide = slides[slideIndex];
-                if (!targetSlide) return;
-        
-                window.scrollTo({
-                    top: targetSlide.offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        });
-        </script><br>
+        }
+
+        requestAnimationFrame(animation);
+    }
+});
+
+        </script>
         
        
        
