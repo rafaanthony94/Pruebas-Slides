@@ -285,54 +285,36 @@ nav ul li a:hover {
 
     </div>
     <script>
-document.addEventListener('DOMContentLoaded', (event) => {
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  const scrollThreshold = 0.35; // Umbral de porcentaje de scroll para cambiar de slide, expresado como fracción
+document.addEventListener('DOMContentLoaded', () => {
+    let isScrolling;
+    const container = document.querySelector('.container');
 
-  let isScrolling = false; // Para evitar múltiples llamadas durante el scroll
+    window.addEventListener('scroll', () => {
+        window.clearTimeout(isScrolling);
 
-  window.addEventListener('scroll', () => {
-    if (isScrolling) return; // Evita nueva ejecución si ya se está procesando un scroll
-    isScrolling = true;
+        isScrolling = setTimeout(() => {
+            const slides = document.querySelectorAll('.slide');
+            let closestSlide = slides[0]; // Asumir inicialmente que el primer slide es el más cercano
+            let closestSlideDistance = Number.MAX_VALUE;
 
-    requestAnimationFrame(() => {
-      const scrollTop = window.scrollY;
-      let activeSlideIndex = slides.findIndex((slide, index) => {
-        const slideTop = slide.offsetTop;
-        const slideHeight = slide.offsetHeight;
-        return scrollTop >= slideTop && scrollTop < slideTop + slideHeight;
-      });
+            for (const slide of slides) {
+                const slideRect = slide.getBoundingClientRect();
+                const slideTopDistanceToCenter = Math.abs(window.innerHeight / 2 - (slideRect.top + slideRect.height / 2));
+                const slideBottomDistanceToCenter = Math.abs(window.innerHeight / 2 - (slideRect.bottom - slideRect.height / 2));
 
-      if (activeSlideIndex === -1) {
-        isScrolling = false;
-        return;
-      }
+                // Determinar si este slide está más cerca del centro del viewport que el actual más cercano
+                if (slideTopDistanceToCenter < closestSlideDistance || slideBottomDistanceToCenter < closestSlideDistance) {
+                    closestSlide = slide;
+                    closestSlideDistance = Math.min(slideTopDistanceToCenter, slideBottomDistanceToCenter);
+                }
+            }
 
-      const activeSlide = slides[activeSlideIndex];
-      const slideTop = activeSlide.offsetTop;
-      const slideHeight = activeSlide.offsetHeight;
-      const scrollPositionWithinSlide = scrollTop - slideTop;
-      const scrollThresholdPixels = scrollThreshold * slideHeight;
-
-      if (scrollPositionWithinSlide > slideHeight - scrollThresholdPixels) {
-        // Scroll hacia abajo, al siguiente slide
-        const nextSlideIndex = activeSlideIndex + 1;
-        if (nextSlideIndex < slides.length) {
-          window.scrollTo({ top: slides[nextSlideIndex].offsetTop, behavior: 'smooth' });
-        }
-      } else if (scrollPositionWithinSlide < scrollThresholdPixels) {
-        // Scroll hacia arriba, al slide anterior
-        const previousSlideIndex = activeSlideIndex - 1;
-        if (previousSlideIndex >= 0) {
-          window.scrollTo({ top: slides[previousSlideIndex].offsetTop, behavior: 'smooth' });
-        }
-      }
-
-      isScrolling = false;
+            // Hacer scroll al slide más cercano al centro del viewport
+            closestSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 66); // Esperar 66ms después del último evento de scroll para determinar que el usuario ha dejado de hacer scroll
     });
-  });
 });
 
-    </script><br>
+    </script>
 </body>
 </html>
