@@ -319,11 +319,10 @@ nav ul li a:hover {
     <script>
      document.addEventListener('DOMContentLoaded', () => {
     let isScrolling;
-    let allowScroll = true; // Permitir o bloquear el scroll
+    let allowScroll = true;
 
     window.addEventListener('scroll', () => {
         if (!allowScroll) {
-            // Bloquear el scroll mientras se está animando hacia otra slide
             return;
         }
 
@@ -331,10 +330,11 @@ nav ul li a:hover {
 
         isScrolling = setTimeout(() => {
             const direction = window.scrollY > lastScrollY ? 'down' : 'up';
+            lastScrollY = window.scrollY; // Mover aquí la actualización de lastScrollY
             moveToSlide(direction);
-        }, 66); // Detectar el fin del scroll
+        }, 66);
 
-        allowScroll = false; // Bloquear nuevos scrolls hasta que termine la animación
+        allowScroll = false;
     });
 
     let lastScrollY = window.scrollY;
@@ -347,10 +347,8 @@ nav ul li a:hover {
             smoothScrollToElement(slides[currentSlideIndex + 1]);
         } else if (direction === 'up' && currentSlideIndex > 0) {
             smoothScrollToElement(slides[currentSlideIndex - 1]);
-        } else {
-            // Si no es posible moverse más, desbloquear el scroll
-            allowScroll = true;
         }
+        // No necesitamos actualizar lastScrollY o alterar allowScroll aquí, ya se maneja antes y después del scroll
     }
 
     function findCurrentSlideIndex(slides, scrollY) {
@@ -363,7 +361,7 @@ nav ul li a:hover {
                 return i;
             }
         }
-        return 0; // Retornar el primer slide si no se encuentra ninguno (por seguridad)
+        return 0;
     }
 
     function smoothScrollToElement(element) {
@@ -374,16 +372,13 @@ nav ul li a:hover {
             behavior: 'smooth'
         });
 
-        // Esperar a que termine el scroll suave para desbloquear el scroll
         setTimeout(() => {
-            lastScrollY = window.scrollY; // Actualizar la última posición de scroll
-            allowScroll = true; // Desbloquear el scroll
-        }, 1000); // Asumiendo que la animación dura menos de 1 segundo
+            allowScroll = true; // Solo reactivar el scroll después de la animación
+        }, 1000);
     }
 });
 
-
-        </script><br>
+        </script>
        
        
 </body>
