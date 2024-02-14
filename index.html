@@ -323,12 +323,14 @@ nav ul li a:hover {
                         }
                         // Desplazamiento hacia arriba
                         else {
-                            if (scrollPosition < slideTop - (window.innerHeight * 0.35) && currentSlideIndex > 0) {
-                                const prevSlideIndex = currentSlideIndex - 1;
-                                window.scrollTo({
-                                    top: slides[prevSlideIndex].offsetTop,
-                                    behavior: 'smooth'
-                                });
+                            if (scrollPosition < slideTop - (window.innerHeight * 0.35)) {
+                                if (currentSlideIndex > 0) {
+                                    const prevSlideIndex = currentSlideIndex - 1;
+                                    window.scrollTo({
+                                        top: slides[prevSlideIndex].offsetTop,
+                                        behavior: 'smooth'
+                                    });
+                                }
                             }
                         }
                         lastScrollPosition = scrollPosition;
@@ -338,7 +340,7 @@ nav ul li a:hover {
             });
         });
     </script>
-<br>    
+    
     
 </body>
 </html>
