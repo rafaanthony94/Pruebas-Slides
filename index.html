@@ -284,6 +284,7 @@ nav ul li a:hover {
         
 
     </div>
+    <br>
     <script>
         // Animación de entrada de las diapositivas al hacer scroll
         document.addEventListener('scroll', () => {
@@ -296,20 +297,41 @@ nav ul li a:hover {
                 }
             });
         });
-
+    
         // Desplazamiento automático entre diapositivas al hacer scroll
         document.addEventListener('scroll', () => {
             const slides = document.querySelectorAll('.slide');
+            let currentIndex = 0;
             slides.forEach((slide, index) => {
                 const slideTop = slide.getBoundingClientRect().top;
                 if (slideTop < window.innerHeight / 2 && slideTop > -window.innerHeight / 2) {
+                    currentIndex = index;
+                }
+            });
+    
+            // Controlar el desplazamiento automático hacia abajo
+            if (currentIndex < slides.length - 1) {
+                const nextSlideTop = slides[currentIndex + 1].getBoundingClientRect().top;
+                if (nextSlideTop < 35) {
                     window.scrollTo({
-                        top: slide.offsetTop,
+                        top: slides[currentIndex + 1].offsetTop,
                         behavior: 'smooth'
                     });
                 }
-            });
+            }
+    
+            // Controlar el desplazamiento automático hacia arriba
+            if (currentIndex > 0) {
+                const prevSlideBottom = slides[currentIndex - 1].getBoundingClientRect().bottom;
+                if (prevSlideBottom < window.innerHeight + 35) {
+                    window.scrollTo({
+                        top: slides[currentIndex - 1].offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }
         });
     </script>
+    
 </body>
 </html>
