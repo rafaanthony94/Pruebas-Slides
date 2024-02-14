@@ -285,62 +285,62 @@ nav ul li a:hover {
 
     </div>
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.slide');
-    let currentSlideIndex = 0;
-    let lastScrollPosition = window.scrollY;
-    let isScrolling = false;
+    let isScrolling;
 
-    const scrollToSlide = (index) => {
-        if (index >= 0 && index < slides.length) {
-            window.scrollTo({
-                top: slides[index].offsetTop,
-                behavior: 'smooth'
-            });
-        }
+    const debounce = (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     };
 
-    window.addEventListener('scroll', () => {
-        if (!isScrolling) {
-            isScrolling = true;
-            setTimeout(() => {
-                const scrollPosition = window.scrollY;
+    const handleScroll = () => {
+        if (isScrolling) return;
+        isScrolling = true;
 
-                if (scrollPosition != lastScrollPosition) { // Solo proceder si la posición de scroll ha cambiado
-                    let slideFound = false;
+        const scrollPosition = window.scrollY;
+        let closestSlideIndex = 0;
+        let smallestDistance = Number.POSITIVE_INFINITY;
 
-                    slides.forEach((slide, index) => {
-                        const slideTop = slide.offsetTop;
-                        const slideHeight = slide.offsetHeight;
+        slides.forEach((slide, index) => {
+            const slideTop = slide.offsetTop;
+            const distance = Math.abs(scrollPosition - slideTop);
+            if (distance < smallestDistance) {
+                smallestDistance = distance;
+                closestSlideIndex = index;
+            }
+        });
 
-                        if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight && !slideFound) {
-                            currentSlideIndex = index;
-                            slideFound = true; // Esto evita cambios adicionales una vez que se encuentra el slide actual.
-                        }
-                    });
+        const closestSlide = slides[closestSlideIndex];
+        const closestSlideTop = closestSlide.offsetTop;
+        const windowCenter = scrollPosition + window.innerHeight / 2;
 
-                    const slide = slides[currentSlideIndex];
-                    const slideTop = slide.offsetTop;
-                    const slideHeight = slide.offsetHeight;
-
-                    // Determinar la dirección del desplazamiento
-                    if (scrollPosition > lastScrollPosition) { // Desplazamiento hacia abajo
-                        if (scrollPosition > slideTop + (slideHeight * 0.35)) {
-                            scrollToSlide(currentSlideIndex + 1);
-                        }
-                    } else { // Desplazamiento hacia arriba
-                        if (scrollPosition < slideTop || scrollPosition < slideTop + (slideHeight * 0.35)) {
-                            scrollToSlide(currentSlideIndex - 1);
-                        }
-                    }
-
-                    lastScrollPosition = scrollPosition; // Actualizar la última posición de scroll conocida
-                }
-                isScrolling = false;
-            }, 200);
+        if (scrollPosition > closestSlideTop + closestSlide.offsetHeight / 2) {
+            // Scroll hacia abajo, mover al siguiente slide si existe
+            if (closestSlideIndex < slides.length - 1) {
+                window.scrollTo({top: slides[closestSlideIndex + 1].offsetTop, behavior: 'smooth'});
+            }
+        } else if (windowCenter < closestSlideTop) {
+            // Scroll hacia arriba, mover al slide anterior si existe
+            window.scrollTo({top: slides[closestSlideIndex].offsetTop, behavior: 'smooth'});
         }
-    });
+
+        // Restablecer isScrolling después de un retardo para evitar que el autoscroll se dispare continuamente
+        setTimeout(() => {
+            isScrolling = false;
+        }, 600); // Ajustar este tiempo según sea necesario para equilibrar la fluidez y la funcionalidad
+    };
+
+    window.addEventListener('scroll', debounce(handleScroll, 100));
 });
+
 
     </script>
     
