@@ -291,58 +291,61 @@ nav ul li a:hover {
     let lastScrollPosition = window.scrollY;
     let isScrolling = false;
 
+    document.addEventListener('DOMContentLoaded', () => {
+    const slides = document.querySelectorAll('.slide');
+    let isAnimating = false;
+
+    const scrollToElement = (element) => {
+        const start = window.scrollY;
+        const end = element.offsetTop;
+        const change = end - start;
+        const duration = 900;
+        let startTime = null;
+
+        function animateScroll(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const timeElapsed = timestamp - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+
+            window.scrollTo(0, start + change * progress);
+
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animateScroll);
+            } else {
+                isAnimating = false;
+            }
+        }
+
+        requestAnimationFrame(animateScroll);
+    };
+
     window.addEventListener('scroll', () => {
-        if (!isScrolling) {
-            isScrolling = true;
-            setTimeout(() => {
-                const scrollPosition = window.scrollY;
-                let slideFound = false;
+        if (isAnimating) return;
 
-                slides.forEach((slide, index) => {
-                    const slideTop = slide.offsetTop;
-                    const slideHeight = slide.offsetHeight;
+        const scrollPosition = window.scrollY;
+        let targetSlide;
 
-                    if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight && !slideFound) {
-                        currentSlideIndex = index;
-                        slideFound = true; // Esto evita cambios adicionales una vez que se encuentra el slide actual.
-                    }
-                });
-
-                const slide = slides[currentSlideIndex];
-                const slideTop = slide.offsetTop;
-                const slideHeight = slide.offsetHeight;
-
-                // Desplazamiento hacia abajo
-                if (scrollPosition > lastScrollPosition) {
-                    if (scrollPosition > slideTop + (slideHeight * 0.35)) {
-                        const nextSlideIndex = currentSlideIndex + 1;
-                        if (nextSlideIndex < slides.length) {
-                            window.scrollTo({
-                                top: slides[nextSlideIndex].offsetTop,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }
+        slides.forEach((slide, index) => {
+            const slideTop = slide.offsetTop;
+            const slideHeight = slide.offsetHeight;
+            if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight) {
+                const direction = scrollPosition - slideTop > slideHeight / 2 ? 1 : -1;
+                const targetIndex = index + direction;
+                if (targetIndex >= 0 && targetIndex < slides.length) {
+                    targetSlide = slides[targetIndex];
                 }
-                // Desplazamiento hacia arriba
-                else {
-                    if (scrollPosition < slideTop && currentSlideIndex > 0) {
-                        const prevSlideIndex = currentSlideIndex - 1;
-                        window.scrollTo({
-                            top: slides[prevSlideIndex].offsetTop,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-                lastScrollPosition = scrollPosition;
-                isScrolling = false;
-            }, 200);
+            }
+        });
+
+        if (targetSlide) {
+            isAnimating = true;
+            scrollToElement(targetSlide);
         }
     });
 });
 
+
     </script>
-    <br>
     
 </body>
 </html>
