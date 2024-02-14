@@ -328,6 +328,7 @@ nav ul li a:hover {
     const highestSlide = slideHeights.reduce((prev, curr) => (curr.height > prev.height ? curr : prev));
 
     const scrollDiff = Math.abs(scrollTop - highestSlide.top);
+    const direction = scrollTop > highestSlide.top ? 1 : -1;
 
     // Scroll suave solo si la diferencia es significativa y supera un umbral
     const scrollThresholdDown = 100; // Umbral para scroll hacia abajo
@@ -336,7 +337,6 @@ nav ul li a:hover {
 
     if (scrollDiff > scrollThreshold) {
       // Calcular la dirección y porcentaje de scroll de acuerdo a la altura
-      const direction = scrollTop > highestSlide.top ? 1 : -1;
       const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limitar al 50% de la ventana
 
       // Calcular el offset de scroll basado en la altura de la slide
@@ -369,6 +369,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script>
+    </script><br>
 </body>
 </html>
