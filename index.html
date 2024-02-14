@@ -287,34 +287,61 @@ nav ul li a:hover {
     <script>
 document.addEventListener('DOMContentLoaded', () => {
     let isScrolling;
-    const container = document.querySelector('.container');
 
     window.addEventListener('scroll', () => {
         window.clearTimeout(isScrolling);
 
         isScrolling = setTimeout(() => {
             const slides = document.querySelectorAll('.slide');
-            let closestSlide = slides[0]; // Asumir inicialmente que el primer slide es el más cercano
-            let closestSlideDistance = Number.MAX_VALUE;
+            let targetSlide = slides[0];
+            let minVisibleHeight = window.innerHeight; // Inicializar con la altura total del viewport
 
             for (const slide of slides) {
-                const slideRect = slide.getBoundingClientRect();
-                const slideTopDistanceToCenter = Math.abs(window.innerHeight / 2 - (slideRect.top + slideRect.height / 2));
-                const slideBottomDistanceToCenter = Math.abs(window.innerHeight / 2 - (slideRect.bottom - slideRect.height / 2));
+                const rect = slide.getBoundingClientRect();
+                const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
 
-                // Determinar si este slide está más cerca del centro del viewport que el actual más cercano
-                if (slideTopDistanceToCenter < closestSlideDistance || slideBottomDistanceToCenter < closestSlideDistance) {
-                    closestSlide = slide;
-                    closestSlideDistance = Math.min(slideTopDistanceToCenter, slideBottomDistanceToCenter);
+                // Buscar el slide con la menor altura visible en el viewport
+                if (visibleHeight < minVisibleHeight && visibleHeight > 0) { // Asegurarse de que la slide sea parcialmente visible
+                    targetSlide = slide;
+                    minVisibleHeight = visibleHeight;
                 }
             }
 
-            // Hacer scroll al slide más cercano al centro del viewport
-            closestSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 66); // Esperar 66ms después del último evento de scroll para determinar que el usuario ha dejado de hacer scroll
+            smoothScrollToElement(targetSlide);
+        }, 66);
     });
 });
 
-    </script>
+function smoothScrollToElement(element) {
+    const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+    const startPosition = window.pageYOffset;
+    const distance = elementTop - startPosition;
+    const duration = 500; // Duración de la animación en milisegundos
+    let startTime = null;
+
+    function animation(currentTime) {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const nextScrollPosition = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+
+        window.scrollTo(0, nextScrollPosition);
+
+        if (timeElapsed < duration) {
+            requestAnimationFrame(animation);
+        }
+    }
+
+    requestAnimationFrame(animation);
+}
+
+function easeInOutQuad(t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+}
+
+
+    </script><br>
 </body>
 </html>
