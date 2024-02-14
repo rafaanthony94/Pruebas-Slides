@@ -312,7 +312,7 @@ nav ul li a:hover {
       const slideTop = slide.offsetTop;
       const slideHeight = slide.offsetHeight;
 
-      // Ignorar slides fuera de la ventana visible
+      // Ignore slides outside the visible window
       if (scrollTop + window.innerHeight < slideTop || slideTop + slideHeight < scrollTop) {
         continue;
       }
@@ -324,39 +324,53 @@ nav ul li a:hover {
       return;
     }
 
-    // Encontrar el slide más alto visible
+    // Find the highest visible slide
     const highestSlide = slideHeights.reduce((prev, curr) => (curr.height > prev.height ? curr : prev));
 
     const scrollDiff = Math.abs(scrollTop - highestSlide.top);
     const direction = scrollTop > highestSlide.top ? 1 : -1;
 
-    // Scroll suave solo si la diferencia es significativa y supera un umbral
+    // Scroll smooth only if difference is significant and exceeds a threshold
     const scrollThresholdDown = 100; // Umbral para scroll hacia abajo
     const scrollThresholdUp = 150; // Umbral para scroll hacia arriba
     const scrollThreshold = direction > 0 ? scrollThresholdDown : scrollThresholdUp;
 
     if (scrollDiff > scrollThreshold) {
-      // Calcular la dirección y porcentaje de scroll de acuerdo a la altura
-      const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limitar al 50% de la ventana
+      // Calculate direction and percentage of scroll based on height
+      const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limit to 50% of viewport
 
-      // Calcular el offset basado en 15vh
+      // Calculate offset based on 15vh
       const scrollOffset = Math.min(scrollPercentage * direction * window.innerHeight * 0.15, window.innerHeight / 2);
 
-      // Comprobar si se llega a la siguiente slide
-      let nextSlideIndex = -1;
+      // Determine the target slide based on direction
+      let targetSlide;
+      if (direction > 0) { // Scrolling down
+        // Find the next slide after the highest
+        let nextSlideIndex = -1;
         for (let i = 0; i < slides.length; i++) {
-        if (slides[i] === highestSlide) {
-            nextSlideIndex = i;
+          if (slides[i] === highestSlide) {
+            nextSlideIndex = i + 1;
             break;
+          }
         }
+        targetSlide = slides[nextSlideIndex];
+      } else { // Scrolling up
+        // Find the previous slide before the highest
+        let prevSlideIndex = -1;
+        for (let i = 0; i < slides.length; i++) {
+          if (slides[i] === highestSlide) {
+            prevSlideIndex = i - 1;
+            break;
+          }
         }
-      const nextSlide = slides[nextSlideIndex];
+        targetSlide = slides[prevSlideIndex];
+      }
 
-      if (nextSlide && newScrollTop + scrollOffset * easedProgress * direction >= nextSlide.offsetTop) {
-        // Scroll solo hasta la parte superior de la siguiente slide
-        newScrollTop = nextSlide.offsetTop;
-      } else {
-        // Animación suave con CubicBezier
+      if (targetSlide) {
+        // Scroll only to the top of the target slide
+        const newScrollTop = targetSlide.offsetTop;
+
+        // Smooth animation with CubicBezier
         const easing = (t) => t * t * t;
         const duration = 200;
         let start = Date.now();
@@ -366,9 +380,9 @@ nav ul li a:hover {
           const progress = (now - start) / duration;
           const easedProgress = easing(progress);
 
-          newScrollTop = scrollTop + scrollOffset * easedProgress * direction;
+          const interpolatedScrollTop = scrollTop + (newScrollTop - scrollTop) * easedProgress;
 
-          window.scrollTo({ top: newScrollTop, behavior: 'smooth' }); // Actualiza la posición
+          window.scrollTo({ top: interpolatedScrollTop, behavior: 'smooth' }); // Update position
 
           if (progress < 1) {
             requestAnimationFrame(animateScroll);
@@ -384,6 +398,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script><br>
+    </script>
 </body>
 </html>
