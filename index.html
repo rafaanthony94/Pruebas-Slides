@@ -285,7 +285,7 @@ nav ul li a:hover {
 
     </div>
     <script>
- const slides = document.querySelectorAll('.slide');
+const slides = Array.from(document.querySelectorAll('.slide'));
 const scrollThreshold = 35; // Umbral de porcentaje de scroll para cambiar de slide
 
 let lastScrollTop = window.scrollY;
@@ -334,6 +334,6 @@ window.addEventListener('scroll', () => {
 
   lastScrollTop = scrollTop;
 });
-    </script><br>
+    </script>
 </body>
 </html>
