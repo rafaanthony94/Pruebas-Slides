@@ -286,7 +286,7 @@ nav ul li a:hover {
     </div>
     <script>
  document.addEventListener('DOMContentLoaded', () => {
-  const slides = document.querySelectorAll('.slide');
+    const slides = document.querySelectorAll('.slide');
   let lastScrollTop = window.scrollY;
   let isScrolling = false;
 
@@ -342,7 +342,7 @@ nav ul li a:hover {
       // Calcular el offset basado en 15vh
       const scrollOffset = Math.min(scrollPercentage * direction * window.innerHeight * 0.15, window.innerHeight / 2);
 
-     let targetSlideIndex = -1;
+      let targetSlideIndex = -1;
       for (let i = 0; i < slides.length; i++) {
         if (slides[i] === highestSlide) {
           targetSlideIndex = direction > 0 ? i + 1 : i - 1; // Adjust for direction
@@ -352,7 +352,7 @@ nav ul li a:hover {
       const targetSlide = slides[targetSlideIndex];
 
       // Ensure valid target slide and use it for scrolling
-      if (targetSlide && targetSlide.offsetTop < scrollTop) {
+      if (targetSlide && targetSlide.offsetTop <= scrollTop) { // Use <= for upward scrolling
         newScrollTop = targetSlide.offsetTop;
       } else {
         // Animación suave con CubicBezier
@@ -383,6 +383,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script>
+    </script><br>
 </body>
 </html>
