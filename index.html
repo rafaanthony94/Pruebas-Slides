@@ -327,10 +327,35 @@ nav ul li a:hover {
     // Encontrar el slide más alto visible
     const highestSlide = slideHeights.reduce((prev, curr) => (curr.height > prev.height ? curr : prev));
 
-    // Desplazarse suavemente al slide más alto solo si la diferencia supera un umbral
+    const scrollDiff = Math.abs(scrollTop - highestSlide.top);
+
+    // Scroll suave solo si la diferencia es significativa y supera un umbral
     const scrollThreshold = 100; // Ajustar el umbral según se quiera
-    if (Math.abs(scrollTop - highestSlide.top) > scrollThreshold) {
-      window.scrollTo({ top: highestSlide.top, behavior: 'smooth' });
+    if (scrollDiff > scrollThreshold) {
+      // Calcular la dirección y porcentaje de scroll de acuerdo a la altura
+      const direction = scrollTop > highestSlide.top ? 1 : -1;
+      const scrollPercentage = Math.min(scrollDiff / window.innerHeight, 0.5); // Limitar al 50% de la ventana
+
+      // Animación suave con CubicBezier para efecto agradable
+      const easing = (t) => t * t * t; // CubicBezier para scroll más natural
+      const duration = 500; // Ajustar la duración de la animación
+      let start = Date.now();
+
+      const animateScroll = () => {
+        const now = Date.now();
+        const progress = (now - start) / duration;
+        const easedProgress = easing(progress);
+
+        const newScrollTop = scrollTop + scrollPercentage * direction * progress * window.innerHeight;
+
+        window.scrollTo({ top: newScrollTop, behavior: 'auto' }); // Usar 'auto' para mejor adaptación
+
+        if (progress < 1) {
+          requestAnimationFrame(animateScroll);
+        }
+      };
+
+      animateScroll();
     }
 
     lastScrollTop = scrollTop;
@@ -338,6 +363,6 @@ nav ul li a:hover {
 
   window.addEventListener('scroll', handleScroll);
 });
-    </script><br>
+    </script>
 </body>
 </html>
