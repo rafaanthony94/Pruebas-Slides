@@ -285,7 +285,7 @@ nav ul li a:hover {
 
     </div>
     <script>
-   document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.slide');
     let lastScrollPosition = window.scrollY;
     let isScrolling;
@@ -324,7 +324,7 @@ nav ul li a:hover {
         const slideHeight = closestSlide.offsetHeight;
         const scrollDelta = scrollPosition - lastScrollPosition;
 
-        // Definir un umbral mínimo de desplazamiento para activar el autoscroll, por ejemplo, 35% del slide
+        // Definir un umbral mínimo de desplazamiento para activar el autoscroll
         const scrollThreshold = slideHeight * 0.35;
 
         if (scrollDelta > 0 && scrollPosition - closestSlideTop > scrollThreshold) {
@@ -339,21 +339,17 @@ nav ul li a:hover {
             }
         }
 
-        // Actualizar la última posición de scroll después de manejar el autoscroll
         lastScrollPosition = scrollPosition;
 
-        // Restablecer isScrolling después de un retardo para evitar que el autoscroll se dispare continuamente
         setTimeout(() => {
             isScrolling = false;
-        }, 600); // Ajustar este tiempo según sea necesario para equilibrar la fluidez y la funcionalidad
+        }, 600);
     };
 
     window.addEventListener('scroll', debounce(handleScroll, 100));
 });
 
 
-
     </script>
-    <br>
 </body>
 </html>
