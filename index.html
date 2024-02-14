@@ -27,7 +27,7 @@
 
 .slide {
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
     scroll-snap-align: start;
     display: flex;
     justify-content: center;
@@ -36,6 +36,8 @@
     text-align: center;
     position: relative;
     padding: 20px 10px;
+    overflow-y: hidden;
+    overflow: none;
 }
 
 /* Definición de colores de fondo para cada slide */
@@ -91,7 +93,7 @@
 
 .service-item {
     width: 100%;
-    max-width: 400px; /* Controla el ancho máximo de cada item de servicio */
+    max-width: 500px; /* Controla el ancho máximo de cada item de servicio */
     text-align: center; /* Alinea el texto al centro debajo de la imagen */
     margin-bottom: 30px; /* Espacio debajo de cada item de servicio */
 }
@@ -115,8 +117,9 @@
 }
 
 .text-content {
-    max-width: 600px; /* Ancho máximo del texto */
+    max-width: 100%; /* Ancho máximo del texto */
     text-align: left; /* Alineación del texto a la izquierda */
+    font-size: 2rem;
 }
 
 .social-icons i {
@@ -172,8 +175,73 @@ nav ul li a:hover {
 }
 
 @media (max-width: 768px) {
+     body, html, .container, .slide {
+        max-width: 100%;
+        box-sizing: border-box; /* Asegura que padding y border estén incluidos en el ancho */
+    }
+    .text-content {
+        font-size: 1rem;
+    }
+    /* Revisar y ajustar padding y margins para no empujar contenido hacia afuera */
+    .content-wrapper, .text-content, nav ul li, .service-item, .overlay {
+        padding: 0 10px; /* Ajusta según sea necesario */
+        margin: 0 auto; /* Centra el contenido si es necesario */
+        box-sizing: border-box;
+    }
     nav ul li {
         margin: 0 10px;
+    }
+    #servicios .gallery {
+        display: flex;
+        overflow-x: scroll; /* Permite desplazamiento horizontal */
+        scroll-snap-type: x mandatory; /* Asegura que los items se ajusten al centro */
+        -webkit-overflow-scrolling: touch; /* Mejora el desplazamiento en iOS */
+    }
+
+    #servicios .service-item {
+        flex: 0 0 90%; /* Cada item ocupa el 100% del ancho de la pantalla */
+        display: flex;
+        flex-direction: column; /* Imagen y texto en columna */
+        justify-content: flex-start; /* Alinea contenido al inicio */
+        align-items: center; /* Centra contenido horizontalmente */
+        scroll-snap-align: start; /* Asegura alineación al desplazar */
+        box-sizing: border-box; /* Incluye padding y border en el cálculo del ancho */
+        padding: 20px 0; /* Espacio arriba y abajo dentro de cada item */
+        max-width: 100%;
+        background-color: black;
+        border-radius: 8px;
+    }
+
+    #servicios .service-item img {
+        width: 90%; /* Imagen ocupa todo el ancho disponible */
+        height: auto; /* Altura auto para mantener proporciones */
+        max-height: 50vh; /* Limita la altura de la imagen a 50% de la altura de la ventana */
+        max-width: 100%;
+    }
+
+    #servicios .service-item p {
+        text-align: center; /* Centra el texto */
+        padding: 10px; /* Espacio alrededor del texto */
+        font-size: 1rem; /* Tamaño del texto */
+    }
+    .gallery-nav {
+        position: absolute;
+        top: 50%; /* Centra los botones verticalmente */
+        transform: translateY(-50%); /* Ajusta la posición para centrar exactamente */
+        background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente para visibilidad */
+        color: white; /* Color del texto/icono */
+        border: none; /* Sin borde */
+        cursor: pointer; /* Cursor de mano para indicar interactividad */
+        padding: 10px 15px; /* Espaciado interior para hacer el botón más grande */
+        z-index: 2; /* Asegura que los botones estén por encima del contenido de la galería */
+    }
+
+    .nav-left {
+        left: 10px; /* Posiciona el botón izquierdo hacia el lado izquierdo */
+    }
+
+    .nav-right {
+        right: 10px; /* Posiciona el botón derecho hacia el lado derecho */
     }
 }
 
@@ -191,6 +259,7 @@ nav ul li a:hover {
     #sobre-nosotros .content, #servicios .gallery {
         flex-direction: column;
         align-items: center;
+        max-width: 100%;
     }
     
     .slide {
@@ -199,18 +268,16 @@ nav ul li a:hover {
     
     #sobre-nosotros img {
         max-width: 250px; /* Ajusta el ancho máximo en dispositivos móviles */
-    }
-    #servicios img {
-        max-width: 150px; /* Ajusta el ancho máximo en dispositivos móviles */
+        margin: 0 auto; /* Centra el texto si el contenedor es más ancho */
     }
     .content-wrapper {
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
     }
     
     .text-content {
         text-align: center;
-        max-width: 100%;
+        width: 90vw; /* Hace que el ancho del texto sea el 80% del ancho de la ventana */
     }
     
     .social-icons a {
@@ -228,6 +295,14 @@ nav ul li a:hover {
     .overlay p, .service-item p, .contact-description {
         font-size: 16px; /* Ajusta el tamaño del texto para mejorar la legibilidad */
     }
+    .contact-description {
+    width: 95vw; /* Hace que el ancho del texto sea el 80% del ancho de la ventana */
+    max-width: 500px; /* Limita el ancho máximo a 500px */
+    font-size: 26px; /* Ajusta el tamaño del texto para mejorar la legibilidad */
+    margin: 0 auto; /* Centra el texto si el contenedor es más ancho */
+    padding: 0 10px; /* Añade un poco de espacio a los lados para evitar que el texto toque los bordes de la pantalla */
+    box-sizing: border-box; /* Asegura que el padding esté incluido en el cálculo del ancho */
+}
 
     .service-item {
         max-width: 100%; /* Permite que los items de servicio ocupen todo el ancho disponible */
@@ -247,6 +322,92 @@ nav ul li a:hover {
     }
 }
 
+.logo {
+    font-family: 'Dancing Script', cursive;
+    font-size: 24px;
+    float: left;
+    margin-left: 20px;
+    display: none; /* Oculto por defecto, se muestra en móviles */
+}
+
+.menu-toggle {
+    display: none; /* Oculto por defecto, se muestra en móviles */
+    cursor: pointer;
+    float: right;
+    margin-right: 20px;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 30px;
+    height: 3px;
+    background-color: #333;
+    margin-bottom: 5px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top:20px;
+}
+
+nav ul li {
+    margin: 0 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #007bff;
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media (max-width: 768px) {
+    .logo {
+        display: block;
+        margin-top: 15px;
+    }
+    .menu-toggle {
+        display: block;
+        margin-top: 15px;
+    }
+    nav {
+        position: fixed; /* Cambiado para posicionar respecto a la ventana */
+        top: 0; /* Desde el top de la ventana */
+        right: 0; /* Alineado a la derecha */
+        background-color: #fff; /* Fondo blanco para el menú */
+        display: flex;
+        flex-direction: column; /* Alinea los elementos del menú en columna */
+        justify-content: center; /* Centra los elementos del menú verticalmente */
+        align-items: center; /* Centra los elementos del menú horizontalmente */
+        transform: translateX(-100%); /* Oculta el menú fuera de la pantalla */
+        transition: transform 0.3s ease; /* Transición suave para mostrar/ocultar el menú */
+        z-index: 1001; /* Asegura que el menú esté por encima de otros elementos */
+        margin-right: 0;
+    }
+    nav ul {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start; /* Alinea los elementos del menú a la izquierda */
+        padding-left: 20px; /* Añade un poco de padding para no pegar al borde */
+
+    }
+
+    nav ul li {
+        margin: 10px 0; /* Espaciado vertical entre elementos del menú */
+    }
+   
+}
+
 
     </style>
 </head>
@@ -255,6 +416,12 @@ nav ul li a:hover {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <div class="container">
         <header>
+            <div class="logo">Floristería Dolores</div>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <nav>
                 <ul>
                     <li><a href="#inicio">Inicio</a></li>
@@ -264,6 +431,8 @@ nav ul li a:hover {
                 </ul>
             </nav>
         </header>
+        
+        
         <!-- Slide Inicio con imagen de fondo -->
         <section class="slide" id="inicio" style="background-image: url('https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg');"> 
             <div class="overlay">
@@ -279,8 +448,10 @@ nav ul li a:hover {
         <div class="content-wrapper">
         <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Sobre Nosotros">
         <div class="text-content">
-            <p>Texto sobre nosotros aquí...</p>
-        </div>
+            <p>
+                En Floristería Dolores, nos enorgullecemos de ser más que una simple tienda de flores. Somos una familia apasionada por la belleza natural y el arte de la floristería, dedicada a crear conexiones emocionales a través de nuestros arreglos florales.
+                <br><br>Desde nuestro humilde inicio, hemos creído en el poder transformador de las flores, capaces de transmitir mensajes de amor, alegría, consuelo y celebración cuando las palabras no son suficientes.
+                        </div>
     </div>
         </section>
         
@@ -289,17 +460,19 @@ nav ul li a:hover {
             <h2>Servicios</h2>
             <div class="gallery">
                 <div class="service-item">
-                    <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Servicio 1">
-                    <p>Arreglos Florales Personalizados - Creaciones únicas para cada ocasión.</p>
+                    <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Arreglos Florales Personalizados">
+                    <p><strong>Arreglos Florales Personalizados</strong> - Nuestros arreglos florales son más que simples flores; son expresiones de amor, alegría y condolencia. Cada creación es única, diseñada para capturar la esencia de tu mensaje y la personalidad del destinatario. Desde románticos ramos de rosas hasta vibrantes composiciones de flores silvestres, transformamos tus sentimientos en arte floral.</p>
                 </div>
                 <div class="service-item">
-                    <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Servicio 2">
-                    <p>Entrega a Domicilio - Llevamos tus flores a cualquier lugar con amor y cuidado.</p>
+                    <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Entrega a Domicilio">
+                    <p><strong>Entrega a Domicilio</strong> - Sabemos que la distancia nunca debería ser un obstáculo para compartir un gesto de cariño. Por eso, ofrecemos un servicio de entrega a domicilio confiable y cuidadoso, asegurando que tus flores lleguen con frescura y belleza intactas. Ya sea a la vuelta de la esquina o al otro lado de la ciudad, llevamos tus flores con el máximo cuidado y puntualidad.</p>
                 </div>
                 <div class="service-item">
-                    <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Servicio 3">
-                    <p>Talleres de Arreglo Floral - Aprende el arte de los arreglos florales con nosotros.</p>
+                    <img src="https://www.madridcoolblog.com/wp-content/uploads/2018/05/MOSS-FLORISTAS-ramos-G.jpg" alt="Talleres de Arreglo Floral">
+                    <p><strong>Talleres de Arreglo Floral</strong> - Sumérgete en el arte y la ciencia de la floristería con nuestros talleres especializados. Dirigidos tanto a aficionados como a profesionales, nuestros talleres están diseñados para inspirar y educar, cubriendo desde técnicas básicas de arreglo hasta los secretos del diseño floral avanzado. Aprende en un ambiente divertido y creativo, y llévate a casa no solo habilidades, sino también tu propia creación floral.</p>
                 </div>
+                <div id="navLeft" class="gallery-nav nav-left">&#10094;</div>
+<div id="navRight" class="gallery-nav nav-right">&#10095;</div>
             </div>
         </section>        
         
@@ -319,6 +492,65 @@ nav ul li a:hover {
 
     </div>
     <script>
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            var menu = document.querySelector('nav ul');
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
+        });
+        </script>
+        
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const gallery = document.querySelector('#servicios .gallery');
+    const items = document.querySelectorAll('#servicios .service-item');
+    let currentIndex = 0;
+
+    const navLeft = document.getElementById('navLeft');
+    const navRight = document.getElementById('navRight');
+
+    navLeft.addEventListener('click', () => moveGallery(-1));
+    navRight.addEventListener('click', () => moveGallery(1));
+
+    function moveGallery(step) {
+        if (currentIndex + step >= 0 && currentIndex + step < items.length) {
+            currentIndex += step;
+            smoothScrollTo(gallery, items[currentIndex].offsetLeft, 500); // Desplaza suavemente durante 500ms
+        }
+    }
+
+    function smoothScrollTo(element, target, duration) {
+        const start = element.scrollLeft,
+            change = target - start,
+            startDate = +new Date(),
+            easeInOutQuad = (t, b, c, d) => {
+                t /= d/2;
+                if (t < 1) return c/2*t*t + b;
+                t--;
+                return -c/2 * (t*(t-2) - 1) + b;
+            },
+            animateScroll = function() {
+                const currentDate = +new Date();
+                const currentTime = currentDate - startDate;
+                element.scrollLeft = parseInt(easeInOutQuad(currentTime, start, change, duration));
+                if (currentTime < duration) {
+                    requestAnimationFrame(animateScroll);
+                } else {
+                    element.scrollLeft = target;
+                }
+            };
+        animateScroll();
+    }
+
+    // Opcional: Ocultar botones si no son necesarios
+    if (items.length <= 1) {
+        navLeft.style.display = 'none';
+        navRight.style.display = 'none';
+    }
+});
+
     document.addEventListener('DOMContentLoaded', () => {
     let currentSlideIndex = 0;
     const slides = document.querySelectorAll('.slide');
