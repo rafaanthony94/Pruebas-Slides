@@ -285,49 +285,56 @@ nav ul li a:hover {
 
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+       document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.slide');
     let currentSlideIndex = 0;
     let lastScrollPosition = window.scrollY;
     let isScrolling = false;
 
-    const getSlideIndexInView = () => {
-        for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i];
-            const slideTop = slide.offsetTop;
-            const slideBottom = slideTop + slide.offsetHeight;
-            const isHalfShown = window.scrollY > slideTop - window.innerHeight / 2 && window.scrollY < slideBottom - window.innerHeight / 2;
-            if (isHalfShown) {
-                return i;
-            }
-        }
-        return -1; // Retorna -1 si ningún slide cumple la condición
-    };
-
     window.addEventListener('scroll', () => {
         if (!isScrolling) {
             isScrolling = true;
-
             setTimeout(() => {
-                const scrollDirection = window.scrollY > lastScrollPosition ? 'down' : 'up';
-                const slideIndexInView = getSlideIndexInView();
-                if (slideIndexInView !== -1) {
-                    currentSlideIndex = slideIndexInView;
-                }
+                const scrollPosition = window.scrollY;
+                let slideFound = false;
 
-                if (scrollDirection === 'down' && currentSlideIndex < slides.length - 1) {
-                    window.scrollTo({
-                        top: slides[currentSlideIndex + 1].offsetTop,
-                        behavior: 'smooth'
-                    });
-                } else if (scrollDirection === 'up' && currentSlideIndex > 0) {
-                    window.scrollTo({
-                        top: slides[currentSlideIndex - 1].offsetTop,
-                        behavior: 'smooth'
-                    });
-                }
+                slides.forEach((slide, index) => {
+                    const slideTop = slide.offsetTop;
+                    const slideHeight = slide.offsetHeight;
 
-                lastScrollPosition = window.scrollY;
+                    if (scrollPosition >= slideTop && scrollPosition < slideTop + slideHeight && !slideFound) {
+                        currentSlideIndex = index;
+                        slideFound = true; // Esto evita cambios adicionales una vez que se encuentra el slide actual.
+                    }
+                });
+
+                const slide = slides[currentSlideIndex];
+                const slideTop = slide.offsetTop;
+                const slideHeight = slide.offsetHeight;
+
+                // Desplazamiento hacia abajo
+                if (scrollPosition > lastScrollPosition) {
+                    if (scrollPosition > slideTop + (slideHeight * 0.35)) {
+                        const nextSlideIndex = currentSlideIndex + 1;
+                        if (nextSlideIndex < slides.length) {
+                            window.scrollTo({
+                                top: slides[nextSlideIndex].offsetTop,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                }
+                // Desplazamiento hacia arriba
+                else {
+                    if (scrollPosition < slideTop && currentSlideIndex > 0) {
+                        const prevSlideIndex = currentSlideIndex - 1;
+                        window.scrollTo({
+                            top: slides[prevSlideIndex].offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+                lastScrollPosition = scrollPosition;
                 isScrolling = false;
             }, 200);
         }
@@ -335,7 +342,7 @@ nav ul li a:hover {
 });
 
     </script>
-
+    <br>
     
 </body>
 </html>
