@@ -288,9 +288,10 @@ nav ul li a:hover {
 document.addEventListener('DOMContentLoaded', () => {
     let isScrolling;
     let isAnimating = false; // Bandera para controlar si estamos animando el scroll
+    let allowScrollHandling = true; // Nueva bandera para controlar el manejo de scroll después de animar
 
     window.addEventListener('scroll', () => {
-        if (isAnimating) return; // Evitar ejecutar el scroll programado si ya estamos animando
+        if (isAnimating || !allowScrollHandling) return; // Evitar ejecutar el scroll programado si ya estamos animando o en período de enfriamiento
 
         window.clearTimeout(isScrolling);
 
@@ -317,6 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function smoothScrollToElement(element) {
     isAnimating = true; // Establecer la bandera a verdadero para indicar que estamos animando
+    allowScrollHandling = false; // Desactivar el manejo de scroll durante la animación
+
     const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
     const startPosition = window.pageYOffset;
     const distance = elementTop - startPosition;
@@ -334,6 +337,9 @@ function smoothScrollToElement(element) {
             requestAnimationFrame(animation);
         } else {
             isAnimating = false; // Restablecer la bandera cuando la animación haya terminado
+            setTimeout(() => {
+                allowScrollHandling = true; // Reactivar el manejo de scroll después de un breve retardo
+            }, 100); // Establecer un retardo antes de permitir otro manejo de scroll
         }
     }
 
@@ -347,10 +353,6 @@ function easeInOutQuad(t, b, c, d) {
     return -c / 2 * (t * (t - 2) - 1) + b;
 }
 
-// Asegurarse de declarar 'isAnimating' al principio del script
-let isAnimating = false;
-
-
-    </script>
+    </script><br>
 </body>
 </html>
