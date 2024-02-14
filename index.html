@@ -284,5 +284,32 @@ nav ul li a:hover {
         
 
     </div>
+    <script>
+        // Animación de entrada de las diapositivas al hacer scroll
+        document.addEventListener('scroll', () => {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => {
+                const slideTop = slide.getBoundingClientRect().top;
+                const slideHeight = slide.clientHeight;
+                if (slideTop < window.innerHeight - slideHeight / 2) {
+                    slide.style.opacity = 1;
+                }
+            });
+        });
+
+        // Desplazamiento automático entre diapositivas al hacer scroll
+        document.addEventListener('scroll', () => {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                const slideTop = slide.getBoundingClientRect().top;
+                if (slideTop < window.innerHeight / 2 && slideTop > -window.innerHeight / 2) {
+                    window.scrollTo({
+                        top: slide.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
