@@ -196,7 +196,7 @@ nav ul li a:hover {
     }
     
     #sobre-nosotros img, #servicios img {
-        max-width: 95%; /* Ajusta el ancho máximo en dispositivos móviles */
+        max-width: 150px; /* Ajusta el ancho máximo en dispositivos móviles */
     }
     .content-wrapper {
         flex-direction: column;
@@ -315,79 +315,53 @@ nav ul li a:hover {
 
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let isScrolling;
-            let isAnimating = false; // Controla si estamos animando el scroll
-            let manualScrollDetected = false; // Indica si se ha detectado un scroll manual
-        
-            window.addEventListener('scroll', () => {
-                // Detectar scroll manual
-                if (!isAnimating) {
-                    manualScrollDetected = true;
+       document.addEventListener('DOMContentLoaded', () => {
+    let lastScrollY = window.scrollY;
+    let isScrolling;
+
+    window.addEventListener('scroll', () => {
+        window.clearTimeout(isScrolling);
+
+        isScrolling = setTimeout(() => {
+            const direction = window.scrollY > lastScrollY ? 'down' : 'up';
+            moveToSlide(direction);
+            lastScrollY = window.scrollY;
+        }, 66);
+    });
+
+    function moveToSlide(direction) {
+        const slides = document.querySelectorAll('.slide');
+        const viewportHeight = window.innerHeight;
+        const currentScrollY = window.scrollY;
+
+        for (let i = 0; i < slides.length; i++) {
+            const slide = slides[i];
+            const slideTop = slide.offsetTop;
+            const slideBottom = slideTop + slide.offsetHeight;
+
+            if (currentScrollY >= slideTop && currentScrollY < slideBottom) {
+                if (direction === 'down' && i < slides.length - 1) {
+                    smoothScrollToElement(slides[i + 1]);
+                } else if (direction === 'up' && i > 0) {
+                    smoothScrollToElement(slides[i - 1]);
                 }
-        
-                window.clearTimeout(isScrolling);
-                isScrolling = setTimeout(() => {
-                    if (!isAnimating && manualScrollDetected) {
-                        autoScrollToClosestSlide();
-                        manualScrollDetected = false; // Resetear la detección de scroll manual
-                    }
-                }, 66);
-            });
-        
-        
-        function autoScrollToClosestSlide() {
-            const slides = document.querySelectorAll('.slide');
-            let closestSlide = slides[0];
-            let closestDistance = Infinity;
-        
-            slides.forEach(slide => {
-                const rect = slide.getBoundingClientRect();
-                const distance = Math.abs(rect.top); // Distancia del slide al top del viewport
-        
-                if (distance < closestDistance) {
-                    closestSlide = slide;
-                    closestDistance = distance;
-                }
-            });
-        
-            smoothScrollToElement(closestSlide);
-        }
-        
-        function smoothScrollToElement(element) {
-        isAnimating = true; // Marcar el inicio de la animación
-
-        const start = window.pageYOffset;
-        const end = element.getBoundingClientRect().top + start;
-        const distance = end - start;
-        const duration = 900; // Ajuste para una animación más suave
-        let startTime = null;
-
-        function scroll(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const timeElapsed = timestamp - startTime;
-            const progress = timeElapsed / duration; // Progreso de 0 a 1
-
-            // Aplicar el easing al progreso antes de calcular la posición de scroll
-            const easedProgress = easeInOutCubic(progress);
-            window.scrollTo(0, start + distance * easedProgress);
-
-            if (timeElapsed < duration) {
-                requestAnimationFrame(scroll);
-            } else {
-                window.scrollTo(0, end); // Asegurar que llegamos al destino final
-                isAnimating = false; // Finalizar la animación
+                break;
             }
         }
+    }
 
-        requestAnimationFrame(scroll);
+    function smoothScrollToElement(element) {
+        const start = window.pageYOffset;
+        const end = element.getBoundingClientRect().top + start;
+        window.scrollTo({ top: end, behavior: 'smooth' });
     }
 
     function easeInOutCubic(t) {
         return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
-});  
-        </script><br>
+});
+
+        </script>
        
        
 </body>
