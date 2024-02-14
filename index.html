@@ -285,8 +285,9 @@ nav ul li a:hover {
 
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+   document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.slide');
+    let lastScrollPosition = window.scrollY;
     let isScrolling;
 
     const debounce = (func, wait) => {
@@ -320,17 +321,26 @@ nav ul li a:hover {
 
         const closestSlide = slides[closestSlideIndex];
         const closestSlideTop = closestSlide.offsetTop;
-        const windowCenter = scrollPosition + window.innerHeight / 2;
+        const slideHeight = closestSlide.offsetHeight;
+        const scrollDelta = scrollPosition - lastScrollPosition;
 
-        if (scrollPosition > closestSlideTop + closestSlide.offsetHeight / 2) {
+        // Definir un umbral mínimo de desplazamiento para activar el autoscroll, por ejemplo, 35% del slide
+        const scrollThreshold = slideHeight * 0.35;
+
+        if (scrollDelta > 0 && scrollPosition - closestSlideTop > scrollThreshold) {
             // Scroll hacia abajo, mover al siguiente slide si existe
             if (closestSlideIndex < slides.length - 1) {
                 window.scrollTo({top: slides[closestSlideIndex + 1].offsetTop, behavior: 'smooth'});
             }
-        } else if (windowCenter < closestSlideTop) {
-            // Scroll hacia arriba, mover al slide anterior si existe
-            window.scrollTo({top: slides[closestSlideIndex].offsetTop, behavior: 'smooth'});
+        } else if (scrollDelta < 0 && closestSlideTop + slideHeight - scrollPosition > scrollThreshold) {
+            // Scroll hacia arriba, mover al slide anterior si existe y se ha superado el umbral
+            if (closestSlideIndex > 0) {
+                window.scrollTo({top: slides[closestSlideIndex - 1].offsetTop, behavior: 'smooth'});
+            }
         }
+
+        // Actualizar la última posición de scroll después de manejar el autoscroll
+        lastScrollPosition = scrollPosition;
 
         // Restablecer isScrolling después de un retardo para evitar que el autoscroll se dispare continuamente
         setTimeout(() => {
@@ -342,7 +352,8 @@ nav ul li a:hover {
 });
 
 
+
     </script>
-    
+    <br>
 </body>
 </html>
